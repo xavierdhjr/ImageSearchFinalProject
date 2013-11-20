@@ -33,6 +33,8 @@ namespace ImageSearchEngine.Controllers
             string queryFolder = "~/queries/";
             string pathToQueryFolder = HttpContext.Server.MapPath(queryFolder);
 
+            return Json("bingo");
+            /*
             string keyFile = KeypointExtractor.ConvertPGMToKeyPoints(queryImage.InputStream, queryId, pathToWinSift, pathToQueryFolder);
             List<Keypoint128> keypoints = KeypointExtractor.GetKeypointsFromKeyFile(keyFile);
             return Json(new ImageQuery()
@@ -40,7 +42,7 @@ namespace ImageSearchEngine.Controllers
                     Id = queryId,
                     Keypoints = keypoints
                 }
-            );
+            );*/
         }
 
     }

@@ -28,7 +28,7 @@ namespace KeypointExtraction
         /// </summary>
         /// <param name="pgmFileBytes"></param>
         /// <returns></returns>
-        public static string ConvertPGMToKeyPoints(Stream inputStream, Guid queryId, string winSiftPath, string saveQueryPath)
+        public static List<IPoint> ConvertPGMToKeyPoints(Stream inputStream, Guid queryId, string winSiftPath, string saveQueryPath)
         {
             
             string pgmFileName = saveQueryPath + queryId + ".pgm";
@@ -99,62 +99,16 @@ namespace KeypointExtraction
             p.WaitForExit(5000);
             p.Close();
             */
-            return keyFile;
+            return ipts;
         }
-
-        /* Nearest neighbor index algorithms */
-        const int LINEAR = 0;
-        const int KDTREE = 1;
-        const int KMEANS = 2;
-        const int COMPOSITE = 3;
-
-        const int CENTERS_RANDOM = 0;
-        const int CENTERS_GONZALES = 1;
-        const int CENTERS_KMEANSPP = 2;
-
-
-        const int LOG_NONE = 0;
-        const int LOG_FATAL = 1;
-        const int LOG_ERROR = 2;
-        const int LOG_WARN = 3;
-        const int LOG_INFO = 4;
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct IndexParameters
-        {
-            public int algorithm;
-            public int checks;
-            public float cb_index;
-            public int trees;
-            public int branching;
-            public int iterations;
-            public int centers_init;
-            public float target_precision;
-            public float build_weight;
-            public float memory_weight;
-            public float sample_fraction;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct FLANNParameters
-        {
-            public int log_level;
-            public IntPtr log_destination;
-            public long random_seed;
-        }
-
-
-        [DllImport("FLANNDLL.dll")]
-        public static extern void flann_log_verbosity(int level);
-        
 
         public static List<Keypoint128> GetKeypointsFromKeyFile(string keyFile)
         {
+
             string[] keyFileContents = File.ReadAllLines(keyFile);
             List<Keypoint128> keypoints = new List<Keypoint128>();
 
-            flann_log_verbosity(2);
-            
+
             /*
              * The file format starts with 2 integers giving the total number of
              *  keypoints and the length of the descriptor vector for each keypoint
@@ -171,6 +125,30 @@ namespace KeypointExtraction
             return keypoints;
         }
 
+
+        public static List<string> GetSimilarImages(Stream inputStream, Guid queryId, string saveQueryPath)
+        {
+
+            List<string> similarImages = new List<string>();
+            string pgmFileName = saveQueryPath + queryId + ".pgm";
+            string keyFile = pgmFileName + ".key";
+
+            using (FileStream file = new FileStream(pgmFileName, FileMode.Create, FileAccess.ReadWrite))
+            {
+                inputStream.CopyTo(file);
+            }
+
+            Bitmap pgmConvertedToBitmap = PGMUtil.ToBitmap(pgmFileName);
+            IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
+            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 2, iimg);
+            Image tempImg = new Bitmap(pgmConvertedToBitmap);
+
+            SurfDescriptor.DecribeInterestPoints(ipts, false, true, iimg); // 128 length descriptor
+
+            
+
+            return similarImages;
+        }
 
     }
 }

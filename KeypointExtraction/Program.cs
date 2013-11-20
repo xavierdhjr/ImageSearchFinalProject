@@ -38,6 +38,12 @@ namespace KeypointExtraction
 
         [DllImport("FLANNDLL.dll", CallingConvention= CallingConvention.Cdecl)]
         public static extern void UpdateCluster(char[] sizeFile, char[] featureFile, char[] imgListFile, char[] clusterOutputFile, char[] bagOfWordsOutputDir);
+
+        [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void UpdateClusterCenters(char[] sizeFile, char[] featureFile, char[] clusterOutputFile);
+
+        [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void CreateBagOfWords(StringBuilder str);
         /*
         [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int* FindNearestNeighbors(char[] clusterFile, float[] imageQuery);
@@ -64,6 +70,7 @@ namespace KeypointExtraction
             char[] sizeFile = (Constants.PATH_TO_FEATURES + "/" + Constants.SIZE_FILE).ToCharArray();
             char[] featuresFile = (Constants.PATH_TO_FEATURES + "/" + Constants.FEATURES_FILE).ToCharArray();
             char[] imgListFile = (Constants.PATH_TO_FEATURES + "/" + Constants.IMGLIST_FILE).ToCharArray();
+            char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray());
             /*
             int dimensionality = 1259;
             float[] query = new float[1259];
@@ -84,7 +91,11 @@ namespace KeypointExtraction
                     incoming[i] = result[i];
                 }
             }*/
-            UpdateCluster(sizeFile, featuresFile, imgListFile, Constants.PATH_TO_CLUSTERS_FILE.ToCharArray(), Constants.PATH_TO_BAGOFWORDS.ToCharArray());
+            //UpdateCluster(sizeFile, featuresFile, imgListFile, Constants.PATH_TO_CLUSTERS_FILE.ToCharArray(), Constants.PATH_TO_BAGOFWORDS.ToCharArray());
+            //UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
+            StringBuilder bldr = new StringBuilder();
+            CreateBagOfWords(bldr);
+            string soup = bldr.ToString();
         }
     }
 }

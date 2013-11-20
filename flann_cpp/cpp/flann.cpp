@@ -120,18 +120,262 @@ namespace {
 
 void init_flann_parameters(FLANNParameters* p)
 {
-	printf("flann params?\n");
+	//printf("flann params?\n");
 	if (p != NULL) {
  		flann_log_verbosity(p->log_level);
-		printf("Set flann log verbosity\n");
+		//printf("Set flann log verbosity\n");
 		flann_log_destination(p->log_destination);
-		printf("Set flann log destination\n");
+		//printf("Set flann log destination\n");
         if (p->random_seed>0) {
 		  seed_random(p->random_seed);
         }
-		printf("Got random seed\n");
+		//printf("Got random seed\n");
 	}
-	printf("yup\n");
+	//printf("yup\n");
+}
+
+void readSizes(vector<int>* outSizes)
+{
+	const char SIZES_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.size";
+	ifstream sizeFileStream;
+	sizeFileStream.open(SIZES_FILE);
+	
+	if(sizeFileStream.is_open())
+	{
+		cout << "Successfully opened " << SIZES_FILE << endl;
+
+		int i = 0;
+		while(!sizeFileStream.eof())
+		{
+			if(i > 50) // arbitrary limit to reduce time
+				break;
+			int size;
+			sizeFileStream >> size;
+			(*outSizes).push_back(size);
+			++i;
+		}
+
+		cout << "Pushed back " << (*outSizes).size() << " sizes." << endl;
+	}
+	else
+	{
+		cout << "There was a problem opening " << SIZES_FILE << endl;
+		return;
+	}
+}
+
+float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
+{
+	const char FEATURE_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.feature";
+	ifstream featureFileStream;
+	featureFileStream.open(FEATURE_FILE);
+	
+	float* data = new float[total_keypoints * KEYPOINT_SIZE];
+	if(featureFileStream.is_open())
+	{
+		cout << "Successfully opened " << FEATURE_FILE << endl;
+
+		int current_keypoint = 0;
+		while(current_keypoint < total_keypoints)
+		{
+			int k = 0;
+			float n;
+			while(k < KEYPOINT_SIZE)
+			{
+				featureFileStream >> n;
+				data[current_keypoint * KEYPOINT_SIZE + k] = n;
+				++k;
+			}
+
+			current_keypoint++;
+		}
+		
+		cout << "Read in " << current_keypoint << " keypoints." << endl;
+		featureFileStream.close();
+	}
+	else
+	{
+		cout << "There was a problem opening " << FEATURE_FILE << endl;
+	}
+	return data;
+}
+
+void readImageNames(vector<string>* outNames)
+{
+	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.size";
+	ifstream imageFileStream;
+	imageFileStream.open(IMAGELIST_FILE);
+	
+	if(imageFileStream.is_open())
+	{
+		cout << "Successfully opened " << IMAGELIST_FILE << endl;
+
+		int i = 0;
+		while(!imageFileStream.eof())
+		{
+			if(i > 50) // arbitrary limit to reduce time
+				break;
+			string size;
+			imageFileStream >> size;
+			(*outNames).push_back(size);
+			++i;
+		}
+
+		cout << "Pushed back " << (*outNames).size() << " image names." << endl;
+	}
+	else
+	{
+		cout << "There was a problem opening " << IMAGELIST_FILE << endl;
+		return;
+	}
+}
+
+void writeClusterData(float* cluster_centers, int clusters_returned, const int KEYPOINT_SIZE)
+{
+	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
+	ofstream clusterFileStream;
+	clusterFileStream.open(CLUSTER_FILE);
+	if(clusterFileStream.is_open())
+	{
+		cout << "Successfully opened " << CLUSTER_FILE << endl;
+		clusterFileStream << clusters_returned << endl;
+		clusterFileStream << KEYPOINT_SIZE << endl;
+
+		for(int i = 0; i < clusters_returned; ++i)
+		{
+			for(int k = 0; k < KEYPOINT_SIZE; ++k)
+			{
+				clusterFileStream << cluster_centers[i * KEYPOINT_SIZE + k] << " ";
+			}
+			clusterFileStream << endl;
+		}
+		cout << "Wrote " << clusters_returned << " cluster centers to file." << endl;
+	}
+	else
+	{
+		cout << "Could not open " << CLUSTER_FILE << endl;
+	}
+}
+
+EXPORTED void CreateBagOfWords(char* str)
+{
+	//buffer = new char[]{ "bingo" };
+	str = new char[20];
+	str[0] = 'a';
+}
+
+EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clusterOutputFile[])
+{
+
+	/*
+		Read in keypoints
+	*/
+
+	const char FEATURE_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.feature";
+	const char SIZES_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.size";
+	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
+	const char BAGOWORDS_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\bagofwords\\bagofwords.txt";
+
+	const int KEYPOINT_SIZE = 128;
+
+	ifstream sizeFileStream;
+	sizeFileStream.open(SIZES_FILE);
+
+	vector<int> sizes;
+	readSizes(&sizes);
+
+	int total_keypoints = 0;
+	for(int i = 0; i < sizes.size(); ++i)
+	{
+		total_keypoints += sizes[i];
+	}
+
+	cout << "There are " << total_keypoints << " keypoints." << endl;
+
+	float* flann_data = readFeatures(total_keypoints, KEYPOINT_SIZE);
+
+	/*
+		
+		Call FLANN Library
+
+	*/
+	const int CLUSTERS = 1500000;
+	IndexParameters index_params;
+	index_params.algorithm = KMEANS;
+	index_params.checks = 2048;
+	index_params.cb_index = 0.6;
+	index_params.branching = 10;
+	index_params.iterations = 15;
+	index_params.centers_init = CENTERS_GONZALES;
+	index_params.target_precision = -1;
+	index_params.build_weight = 0.01;
+	index_params.memory_weight = 1;
+	float* cluster_centers = new float[CLUSTERS * KEYPOINT_SIZE];
+	int flann_result = flann_compute_cluster_centers(flann_data, total_keypoints, KEYPOINT_SIZE, CLUSTERS, cluster_centers, &index_params, NULL);
+	cout << "Flann result: " << flann_result << endl;
+	
+	int clusters_returned = flann_result;
+	writeClusterData(cluster_centers, clusters_returned, KEYPOINT_SIZE);
+
+	IndexParameters build_index_params;
+	build_index_params.algorithm = KDTREE;
+	build_index_params.checks = 2048;
+	build_index_params.trees = 8;
+	build_index_params.target_precision = -1;
+	build_index_params.build_weight = 0.01;
+	build_index_params.memory_weight = 1;
+
+	float speedup;
+	FLANN_INDEX index = flann_build_index(cluster_centers,clusters_returned,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
+	cout << "Build index. " << endl;
+
+	ofstream bagOfWordsStream;
+	bagOfWordsStream.open(BAGOWORDS_FILE);
+
+	if(bagOfWordsStream.is_open())
+	{
+		cout << "Successfully opened " << BAGOWORDS_FILE << endl;
+
+		FLANNParameters flann_params;
+		flann_params.log_level = LOG_NONE;
+		flann_params.log_destination = NULL;
+		flann_params.random_seed = CENTERS_RANDOM;
+		int keypoints_examined = 0;
+		for(int i = 0; i < sizes.size(); ++i)
+		{
+
+			//int* nearest =  &nearest_neighbors_result[i];
+			//int nearest_num = (int)(*(nearest + 4)); // the cluster center id is stored in the next 4 bytes
+			bagOfWordsStream << "<DOC>" << endl;
+			bagOfWordsStream << "<DOCNO>" << i << "</DOCNO>" << endl;
+			bagOfWordsStream << "<TEXT>" << endl;
+
+			int keypoints_i = sizes[i];
+			for(int j = 0; j < sizes[i]; ++j)
+			{
+				float* keypoint = new float[KEYPOINT_SIZE];
+				for(int k = 0; k < KEYPOINT_SIZE; ++k)
+				{
+					keypoint[k] = flann_data[keypoints_examined * KEYPOINT_SIZE + k];
+				}
+				keypoints_examined++;
+				int* nearest_neighbor = new int[1];
+				int _r = flann_find_nearest_neighbors_index(index,keypoint,1,nearest_neighbor,1,1024,&flann_params);
+				bagOfWordsStream << "w" << nearest_neighbor[0] << " ";
+			}
+			bagOfWordsStream << endl << "</TEXT>" << endl;
+			bagOfWordsStream << "</DOC>" << endl;
+			
+		}
+		cout << "Wrote " << sizes.size() << " bag of words documents." << endl;
+		bagOfWordsStream.close();
+	}
+	else
+	{
+		cout << "There was a problem opening " << BAGOWORDS_FILE << endl;
+	}
+
+	
 }
 
 // Format of file:
@@ -214,7 +458,6 @@ EXPORTED int* FindNearestNeighbors(char* clusterFile, float* imageQuery)
 
 	return result;
 }
-
 /*
 void WriteBagOfWords(char* imgListFile, char* bagOfWordsOutputFile, char* featureFile, FLANN_INDEX index, const int KEYPOINT_DIMENSIONALITY)
 {
@@ -276,7 +519,7 @@ void WriteBagOfWords(char* imgListFile, char* bagOfWordsOutputFile, char* featur
 	printf("Finished writing file.\n");
 }
 */
-void ReadSizes(vector<int>* sizes, char* sizeFile)
+void ReadSizes(vector<int>* sizes, const char* sizeFile)
 {
 
 	std::ifstream sizeFileStream;
@@ -287,6 +530,8 @@ void ReadSizes(vector<int>* sizes, char* sizeFile)
 		int i = 0;
 		while(!sizeFileStream.eof())
 		{
+			if(i > 100)
+				break;
 			std::string str;
 			sizeFileStream >> str;
 			int size = atoi(str.c_str());
@@ -302,10 +547,6 @@ void ReadSizes(vector<int>* sizes, char* sizeFile)
 	std::cout << "Finished reading " << (*sizes).size() << " sizes." << std::endl;
 	sizeFileStream.close();
 }
-
-/*
-	This function reads all keypoints from every image
-*/
 float* ReadFeatures(char* featureFile, int totalKeypoints, const int KEYPOINT_DIMENSIONALITY)
 {
 	float* all_keypoints_flat_data;
@@ -369,63 +610,6 @@ float* ReadFeatures(char* featureFile, int totalKeypoints, const int KEYPOINT_DI
 			}
 			float percent_complete = (float)current_keypoint / (float)totalKeypoints;
 			printf("Percent complete: %f\n",percent_complete);
-
-			/*
-			if(percent_complete > 1)
-			{
-				printf("Percent complete: %f\n",percent_complete);
-			}else
-			if(percent_complete > 5)
-			{
-				printf("Percent complete: %f\n",percent_complete);
-			}else
-			if(percent_complete > 20)
-			{
-				printf("Percent complete: %f\n",percent_complete);
-			}else
-			if(percent_complete > 60)
-			{
-				printf("Percent complete: %f\n",percent_complete);
-			}else
-			if(percent_complete > 90)
-			{
-				printf("Percent complete: %f\n",percent_complete);
-			}*/
-			/*
-			if(image_file_count >= maxFiles)
-				break;
-			int keypontsLeft = sizes[image_file_count]; // how many keypoints are we reading?
-			int maxKeypointsLeft = column_size; // so we can have a d x n matrix for FLANN
-			std::vector<std::vector<float>> image_keypoints;
-			while(keypontsLeft > 0)
-			{
-				std::vector<float> point;
-				int i = 0; 
-				while(i < KEYPOINT_DIMENSIONALITY)
-				{
-
-					std::string dimension;
-					featureFileStream >> dimension;
-
-					int f = atoi(dimension.c_str());
-					point.push_back(f);
-					i++;
-				}
-				keypoint_count++;
-				keypontsLeft--;
-				maxKeypointsLeft--;
-				// meh, assume this data is perfect for now
-				// otherwise we'd need to keep in mind the case where we run out of file before we find all keypoints
-			}
-			while(maxKeypointsLeft > 0)
-			{
-				keypoints.push_back(0); // push back an empty result for this keypoint
-				maxKeypointsLeft--;
-				keypoint_count++;
-				
-			}
-			image_file_count++;
-			*/
 		}
 	}else{
 		printf("Error opening file %s\n",featureFile);
@@ -436,7 +620,6 @@ float* ReadFeatures(char* featureFile, int totalKeypoints, const int KEYPOINT_DI
 	printf("Finished reading %d keypoints.\n", totalKeypoints);
 	return all_keypoints_flat_data;
 }
-
 int ReadClusterFile(char* clusterOutputFile, float* cluster_centers, int* numClusters)
 {
 	std::ifstream fileStream;
@@ -519,6 +702,27 @@ EXPORTED void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile
 	const int RESULT_ROWS = NUM_VISUAL_WORDS * KEYPOINT_DIMENSIONALITY;
 	float* _centers = new float[0];
 	int num_rows;
+		
+	const char NULL_BYTE[] = { '\0' };
+	/*
+	strcat(sizeFile, NULL_BYTE);
+	strcat(featureFile, NULL_BYTE);
+	strcat(imgListFile, NULL_BYTE);
+	strcat(clusterOutputFile, NULL_BYTE);
+	strcat(bagOfWordsOutputFile, NULL_BYTE);
+
+	strcat(sizeFile, NULL_BYTE);
+	strcat(featureFile, NULL_BYTE);
+	strcat(imgListFile, NULL_BYTE);
+	strcat(clusterOutputFile, NULL_BYTE);
+	strcat(bagOfWordsOutputFile, NULL_BYTE);
+
+	strcat(sizeFile, NULL_BYTE);
+	strcat(featureFile, NULL_BYTE);
+	strcat(imgListFile, NULL_BYTE);
+	strcat(clusterOutputFile, NULL_BYTE);
+	strcat(bagOfWordsOutputFile, NULL_BYTE);
+	*/
 	int cr = ReadClusterFile(clusterOutputFile, _centers, &num_rows);
 	if(cr == 1)
 	{
@@ -533,7 +737,7 @@ EXPORTED void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile
 
 		float speedup;
 		printf("Created %d rows.\n",num_rows);
-		FLANN_INDEX index = flann_build_index(_centers,num_rows,KEYPOINT_DIMENSIONALITY,&speedup, &build_index_params,NULL);
+		FLANN_INDEX index = flann_build_index(_centers,10,KEYPOINT_DIMENSIONALITY,&speedup, &build_index_params,NULL);
 		printf("Built index.\n");
 			const char null_byte[] = { '\0' };
 		
@@ -544,7 +748,8 @@ EXPORTED void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile
 		strcpy(outputFile, bagOfWordsOutputFile);
 
 		std::ifstream imgListFileStream;
-		imgListFileStream.open(imgListFile);
+		std::string imgListFileStr(imgListFile);
+		imgListFileStream.open(imgListFileStr.c_str());
 
 		vector<std::string> fileNames;
 
@@ -571,7 +776,8 @@ EXPORTED void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile
 		std::cout << outputFileForReal << std::endl;
 
 		vector<int> sizes; // says how many 128 vectors a document has (for each element)
-		ReadSizes(&sizes, sizeFile);
+		std::string sizeFileStr(sizeFile);
+		ReadSizes(&sizes, sizeFileStr.c_str());
 
 		int total_keypoints_possible = 0;
 		for(int i = 0; i < sizes.size(); ++i)
@@ -606,7 +812,6 @@ EXPORTED void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile
 				}
 				keypoints_examined++;
 				int* nearest_neighbor = new int[1];
-
 				int _r = flann_find_nearest_neighbors_index(index,keypoint,1,nearest_neighbor,1,1024,&flann_params);
 				bagOfWordsFile << "w" << nearest_neighbor[0] << " ";
 			}
@@ -618,19 +823,12 @@ EXPORTED void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile
 		bagOfWordsFile.close();
 
 		printf("Finished writing file.\n");
+
 		return;
 	}else{
 		printf("Failed to read cluster file.\n");
 		return;
 	}
-
-	const char NULL_BYTE[] = { '\0' };
-
-	strcat(sizeFile, NULL_BYTE);
-	strcat(featureFile, NULL_BYTE);
-	strcat(imgListFile, NULL_BYTE);
-	strcat(clusterOutputFile, NULL_BYTE);
-	strcat(bagOfWordsOutputFile, NULL_BYTE);
 
 	vector<int> sizes; // says how many 128 vectors a document has (for each element)
 
@@ -732,7 +930,7 @@ EXPORTED void flann_log_verbosity(int level)
 EXPORTED void flann_log_destination(char* destination)
 {
     logger.setDestination(destination);
-	printf("Destination set!\n");
+	//printf("Destination set!\n");
 }
 
 
@@ -741,9 +939,9 @@ EXPORTED FLANN_INDEX flann_build_index(float* dataset, int rows, int cols, float
 	try {
 
 		init_flann_parameters(flann_params);
-		printf("finished init\n");
+		//printf("finished init\n");
 		DatasetPtr inputData = new Dataset<float>(rows,cols,dataset);
-		printf("finished input data setup\n");
+		//printf("finished input data setup\n");
 		if (index_params == NULL) {
 			throw FLANNException("The index_params agument must be non-null");
 		}
@@ -752,7 +950,7 @@ EXPORTED FLANN_INDEX flann_build_index(float* dataset, int rows, int cols, float
         float build_weight = index_params->build_weight;
         float memory_weight = index_params->memory_weight;
         float sample_fraction = index_params->sample_fraction;
-		printf("init'd vars\n");
+		//printf("init'd vars\n");
 		NNIndex* index = NULL;
 		if (target_precision < 0) {
 			Params params = parametersToParams(*index_params);
@@ -761,11 +959,11 @@ EXPORTED FLANN_INDEX flann_build_index(float* dataset, int rows, int cols, float
             StartStopTimer t;
             t.start();
 
-				printf("About to build index\n");
+				//printf("About to build index\n");
 
             index->buildIndex();
 
-				printf("built index in %3f second\n", t.value);
+				//printf("built index in %3f second\n", t.value);
 
             t.stop();
             logger.info("Building index took: %g\n",t.value);
@@ -860,16 +1058,16 @@ EXPORTED int flann_find_nearest_neighbors_index(FLANN_INDEX index_ptr, float* te
             throw FLANNException("Invalid index");
         }
         NNIndexPtr index = NNIndexPtr(index_ptr);
-		printf("Setup nnindex ptr\n");
+		//printf("Setup nnindex ptr\n");
         int length = index->veclen();        
         StartStopTimer t;
         t.start();
         Params searchParams;
         searchParams["checks"] = checks;
         Dataset<int> result_set(tcount, nn, result);
-		printf("Setup result set\n");
+		//printf("Setup result set\n");
         search_for_neighbors(*index, Dataset<float>(tcount, length, testset), result_set, searchParams);
-		printf("nearest neighbor search complete!\n");
+		//printf("nearest neighbor search complete!\n");
         t.stop();
         logger.info("Searching took %g seconds\n",t.value);
 

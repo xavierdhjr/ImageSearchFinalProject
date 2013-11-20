@@ -10,6 +10,37 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\CompositeTree.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\dist.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\KDTree.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\KMeansTree.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\LinearSearch.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\NNIndex.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\constants.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\flann.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\Autotune.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\ground_truth.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\simplex_downhill.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\Testing.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Allocator.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\common.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Dataset.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Heap.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Logger.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Random.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\ResultSet.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Timer.h" />
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Variant.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\flann_cpp\cpp\algorithms\NNIndex.cpp" />
+    <ClCompile Include="..\..\flann_cpp\cpp\flann.cpp" />
+    <ClCompile Include="..\..\flann_cpp\cpp\nn\Testing.cpp" />
+    <ClCompile Include="..\..\flann_cpp\cpp\tests\flann_test.cc" />
+    <ClCompile Include="..\..\flann_cpp\cpp\util\Logger.cpp" />
+    <ClCompile Include="..\..\flann_cpp\cpp\util\Random.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E418FFDC-AD17-45B0-B346-27F48DBF8879}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -76,42 +107,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\NNIndex.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\flann.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Testing.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\tests\flann_test.cc" />
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Logger.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Random.cpp" />
-    <ClCompile Include="FLANNWrapper.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\CompositeTree.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\dist.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\KDTree.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\KMeansTree.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\LinearSearch.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\NNIndex.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\constants.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\flann.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Autotune.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\ground_truth.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\simplex_downhill.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Testing.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Allocator.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\common.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Dataset.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Heap.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Logger.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Random.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\ResultSet.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Timer.h" />
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Variant.h" />
-    <ClInclude Include="FLANNWrapper.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\CMakeLists.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

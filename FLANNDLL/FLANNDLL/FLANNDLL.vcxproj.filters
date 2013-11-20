@@ -15,97 +15,88 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\tests\flann_test.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\flann.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\NNIndex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Testing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FLANNWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Allocator.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\CompositeTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\common.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\dist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Dataset.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\KDTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Heap.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\KMeansTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Logger.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\LinearSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Random.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\algorithms\NNIndex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\ResultSet.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Timer.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\flann.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Variant.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\Autotune.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\constants.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\ground_truth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\flann.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\simplex_downhill.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\CompositeTree.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\nn\Testing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\dist.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Allocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\KDTree.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\KMeansTree.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Dataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\LinearSearch.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Heap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\NNIndex.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Autotune.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\ground_truth.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\ResultSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\simplex_downhill.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Testing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FLANNWrapper.h">
+    <ClInclude Include="..\..\flann_cpp\cpp\util\Variant.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\CMakeLists.txt" />
+    <ClCompile Include="..\..\flann_cpp\cpp\algorithms\NNIndex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\flann_cpp\cpp\flann.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\flann_cpp\cpp\nn\Testing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\flann_cpp\cpp\tests\flann_test.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\flann_cpp\cpp\util\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\flann_cpp\cpp\util\Random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

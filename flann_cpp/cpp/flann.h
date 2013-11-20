@@ -49,6 +49,10 @@ typedef void* FLANN_INDEX;
 extern "C" {
 #endif
 
+LIBSPEC void CreateBagOfWords(char* str);
+
+LIBSPEC void UpdateClusterCenters(char sizeFile[], char featureFile[], char clusterOutputFile[]);
+
 LIBSPEC int* FindNearestNeighbors(char* clusterFile, float* imageQuery);
 // Wrapper function for use by C#
 LIBSPEC void UpdateCluster(char* sizeFile, char* featureFile, char* imgListFile, char* clusterOutputFile, char* bagOfWordsOutputDir);

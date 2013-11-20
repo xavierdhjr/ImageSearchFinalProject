@@ -32,11 +32,9 @@ public:
     void setDestination(const char* name)
     {
         if (name==NULL) {
-			printf("Name was null\n");
             stream = stdout;
         }
         else {
-			printf("Name was NOT null. Setting stream to filestream\n");
             stream = fopen(name,"w");
             if (stream == NULL) {
                 stream = stdout;

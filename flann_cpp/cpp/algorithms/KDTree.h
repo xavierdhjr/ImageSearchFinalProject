@@ -189,7 +189,7 @@ public:
 	{
 		/* Construct the randomized trees. */
 		for (int i = 0; i < numTrees; i++) {
-			printf("i[%d]\n",i);
+			//printf("i[%d]\n",i);
 			/* Randomize the order of vectors to allow for unbiased sampling. */
 			for (int j = size_; j > 0; --j) {
 				int rnd = 0;
@@ -198,7 +198,7 @@ public:
 				assert(rnd >=0 && rnd < size_);
 				swap(vind[j-1], vind[rnd]);
 			}
-			printf("Randomized vectors\n");
+			//printf("Randomized vectors\n");
 
 			trees[i] = NULL;
 			divideTree(&trees[i], 0, size_ - 1);
@@ -283,23 +283,23 @@ private:
 	void divideTree(Tree* pTree, int first, int last)
 	{
 		Tree node;
-		printf("dividing tree\n");
+		//printf("dividing tree\n");
 		node = pool.allocate<TreeSt>(); // allocate memory
 		*pTree = node;
 	
 		/* If only one exemplar remains, then make this a leaf node. */
 		if (first == last) {
-			printf("first is last \n");
+			//printf("first is last \n");
 			node->child1 = node->child2 = NULL;    /* Mark as leaf node. */
-			printf("leaf node marked \n");
+			//printf("leaf node marked \n");
 			node->divfeat = vind[first];    /* Store index of this vec. */
 		} else {
 			chooseDivision(node, first, last);
-			printf("division chosen \n");
+			//printf("division chosen \n");
 			subdivide(node, first, last);
-			printf("sub divided \n");
+			//printf("sub divided \n");
 		}
-		printf("finished dividing tree\n");
+		//printf("finished dividing tree\n");
 	}
 	
 	
