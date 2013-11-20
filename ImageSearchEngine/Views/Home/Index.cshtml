@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<script src="~/Scripts/plugins/jquery.form.min.js"></script>
+<script src="~/Scripts/site/imagequery.home.js"></script>
+
+<h2>Index</h2>
+
+<form id="homeForm" action="/Home/Query" method="post" enctype="multipart/form-data">
+    <input type="file" name="queryImage" />
+    Submit a query image: <input type="submit" />
+</form>
+<div id="response"></div>

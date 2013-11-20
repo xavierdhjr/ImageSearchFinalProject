@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A2A96FBA-943E-4603-9E9A-6167E5C089C2}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <Keyword>ManagedCProj</Keyword>
+    <RootNamespace>FLANNDLL</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\CompositeTree.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\dist.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\KDTree.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\KMeansTree.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\LinearSearch.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\NNIndex.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\constants.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\flann.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Autotune.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\ground_truth.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\simplex_downhill.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Testing.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Allocator.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\common.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Dataset.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Heap.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Logger.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Random.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\ResultSet.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Timer.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Variant.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\algorithms\NNIndex.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\flann.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\nn\Testing.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\tests\flann_test.cc" />
+    <ClCompile Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Logger.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\util\Random.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\..\..\Downloads\cse484project\flann\source code\flann-1.1-win32\src\cpp\CMakeLists.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
