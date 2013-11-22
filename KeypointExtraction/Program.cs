@@ -42,8 +42,9 @@ namespace KeypointExtraction
         [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void UpdateClusterCenters(char[] sizeFile, char[] featureFile, char[] clusterOutputFile);
 
-        [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void CreateBagOfWords(StringBuilder str);
+        [DllImport("FLANNDLL.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string CreateBagOfWords();
         /*
         [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int* FindNearestNeighbors(char[] clusterFile, float[] imageQuery);
@@ -93,9 +94,7 @@ namespace KeypointExtraction
             }*/
             //UpdateCluster(sizeFile, featuresFile, imgListFile, Constants.PATH_TO_CLUSTERS_FILE.ToCharArray(), Constants.PATH_TO_BAGOFWORDS.ToCharArray());
             //UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
-            StringBuilder bldr = new StringBuilder();
-            CreateBagOfWords(bldr);
-            string soup = bldr.ToString();
+            string soup = CreateBagOfWords();
         }
     }
 }

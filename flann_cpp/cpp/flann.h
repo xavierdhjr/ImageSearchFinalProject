@@ -49,7 +49,7 @@ typedef void* FLANN_INDEX;
 extern "C" {
 #endif
 
-LIBSPEC void CreateBagOfWords(char* str);
+LIBSPEC char* CreateBagOfWords();
 
 LIBSPEC void UpdateClusterCenters(char sizeFile[], char featureFile[], char clusterOutputFile[]);
 

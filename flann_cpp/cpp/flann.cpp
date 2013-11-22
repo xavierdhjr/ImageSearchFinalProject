@@ -10,6 +10,7 @@
 #include "algorithms/LinearSearch.h"
 #include "nn/Autotune.h"
 #include "nn/Testing.h"
+#include <objbase.h>
 using namespace std;
 
 
@@ -257,11 +258,18 @@ void writeClusterData(float* cluster_centers, int clusters_returned, const int K
 	}
 }
 
-EXPORTED void CreateBagOfWords(char* str)
+EXPORTED char* CreateBagOfWords()
 {
-	//buffer = new char[]{ "bingo" };
-	str = new char[20];
-	str[0] = 'a';
+    char szSampleString[] = "Hello World";
+    ULONG ulSize = strlen(szSampleString) + sizeof(char);
+    char* pszReturn = NULL;
+
+    pszReturn = (char*)::CoTaskMemAlloc(ulSize);
+    // Copy the contents of szSampleString
+    // to the memory pointed to by pszReturn.
+    strcpy(pszReturn, szSampleString);
+    // Return pszReturn.
+    return pszReturn;
 }
 
 EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clusterOutputFile[])
