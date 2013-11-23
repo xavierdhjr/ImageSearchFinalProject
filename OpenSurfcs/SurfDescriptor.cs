@@ -160,8 +160,16 @@ namespace OpenSURFcs
       int Y = (int)Math.Round(ip.y, 0);
       int S = (int)Math.Round(ip.scale, 0);
 
-      // Allocate descriptor memory
-      ip.SetDescriptorLength(64);
+      if (!bExtended)
+      {
+          // Allocate descriptor memory
+          ip.SetDescriptorLength(64);
+      }
+      else
+      {
+          // Allocate descriptor memory
+          ip.SetDescriptorLength(128);
+      }
 
       if (bUpright)
       {

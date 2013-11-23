@@ -25,21 +25,14 @@ namespace ImageSearchEngine.Controllers
         //
         // GET: /Home/
 
-        public class ImageQuery
-        {
-            public Guid Id;
-            public List<Keypoint128> Keypoints;
-
-        }
-
         const string INDEX_DIRECTORY = @"C:\Users\Raider\ImageSearchFinalProject\LuceneIndex\Index";
-        const string DOCUMENT_DIRECTORY = @"C:\Users\Raider\ImageSearchFinalProject\LuceneIndex\Collection\coll";
+        const string DOCUMENT_DIRECTORY = @"C:\Users\Raider\ImageSearchFinalProject\cse484project\bagofwords";
 
         public ActionResult IndexDocuments()
         {
             DateTime start = DateTime.Now;
 
-            Analyzer analyzer = new StopAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
+            Analyzer analyzer = new WhitespaceAnalyzer();// new StopAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
             Directory dir = FSDirectory.Open(INDEX_DIRECTORY);
             Directory docDirectory = FSDirectory.Open(DOCUMENT_DIRECTORY);
             IndexWriter writer = new IndexWriter(dir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
@@ -73,8 +66,30 @@ namespace ImageSearchEngine.Controllers
             return View();
         }
 
+        private List<string> doBatchSearch(System.IO.StringReader strReader, IndexSearcher searcher, string qid, Query query, string runTag)
+        {
+            TopDocs results = searcher.Search(query, 2000);
+            ScoreDoc[] hits = results.ScoreDocs;
+            int numTotalHits = results.TotalHits;
+            int start = 0;
+            int end = Math.Min(numTotalHits, 1000);
 
-        public JsonResult Query(HttpPostedFileBase queryImage)
+            Dictionary<string, string> seen = new Dictionary<string, string>();
+            List<string> seenList = new List<string>();
+            for (int i = start; i < end; ++i)
+            {
+                Document doc = searcher.Doc(hits[i].Doc);
+                string docno = doc.Get("docno");
+                if (seen.ContainsKey(docno))
+                    continue;
+                seen.Add(docno, docno);
+                seenList.Add(docno);
+
+            }
+            return seenList;
+        }
+
+        public ActionResult Query(HttpPostedFileBase queryImage)
         {
             Guid queryId = Guid.NewGuid();
             string winSiftFileName = "~/siftWin32.exe";
@@ -82,7 +97,61 @@ namespace ImageSearchEngine.Controllers
             string queryFolder = "~/queries/";
             string pathToQueryFolder = HttpContext.Server.MapPath(queryFolder);
 
-            return Json("bingo");
+            string bagOfWords = KeypointExtractor.GetBagOfWords(queryImage.InputStream, queryId, pathToQueryFolder);
+            Similarity sim = new DefaultSimilarity();
+            IndexReader reader = DirectoryReader.Open(FSDirectory.Open(INDEX_DIRECTORY),true);
+            Analyzer analyzer = new WhitespaceAnalyzer();// new StopAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
+            IndexSearcher searcher = new IndexSearcher(reader);
+            searcher.Similarity = sim;
+
+            System.IO.StringReader strReader = new System.IO.StringReader(bagOfWords);
+            QueryParser parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, "contents", analyzer);
+            int num_queries = 0;
+            List<string> results = new List<string>();
+            while (true)
+            {
+                string line = strReader.ReadLine();
+                if (line == null || line.Length == -1)
+                    break;
+                string query_id = null;
+                if (line.Equals("<DOC>"))
+                {
+                    line = strReader.ReadLine();
+                    query_id = line.Replace("<DOCNO>", "");
+                    query_id = query_id.Replace("</DOCNO>", "");
+                    line = strReader.ReadLine();
+                    line = strReader.ReadLine();
+                }
+                else
+                {
+                    continue;
+                }
+
+                line = line.Trim();
+                if (line.Length == 0)
+                    break;
+
+                line = line.Replace("/", " ");
+
+                Query query = parser.Parse(line);
+                num_queries++;
+                results = doBatchSearch(strReader, searcher, query_id, query, "default");
+
+                line = strReader.ReadLine();
+                line = strReader.ReadLine();
+                if (!line.Equals("</DOC>")) break;
+            }
+
+            reader.Dispose();
+            SimilarImageResult result = new SimilarImageResult();
+            result.SimilarImages = new List<string>();
+            result.PathToQueryImage = Url.Content(queryFolder + queryId.ToString() + ".png");
+            foreach (string str in results)
+            {
+                result.SimilarImages.Add(Url.Content(Constants.VIRTUALPATH_TO_IMAGES + str));
+            }
+            
+            return View(result);
             /*
             string keyFile = KeypointExtractor.ConvertPGMToKeyPoints(queryImage.InputStream, queryId, pathToWinSift, pathToQueryFolder);
             List<Keypoint128> keypoints = KeypointExtractor.GetKeypointsFromKeyFile(keyFile);
@@ -92,6 +161,12 @@ namespace ImageSearchEngine.Controllers
                     Keypoints = keypoints
                 }
             );*/
+        }
+
+        public class SimilarImageResult
+        {
+            public string PathToQueryImage;
+            public List<string> SimilarImages;
         }
 
     }

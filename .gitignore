@@ -156,3 +156,5 @@ $RECYCLE.BIN/
 .DS_Store
 cse484project/
 LuceneIndex/
+ImageSearchEngine/img
+ImageSearchEngine/queries

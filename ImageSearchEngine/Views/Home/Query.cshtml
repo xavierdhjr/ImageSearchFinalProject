@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Query";
+}
+
+<h2>Query</h2>
+
+@model ImageSearchEngine.Controllers.HomeController.SimilarImageResult
+
+<h3>Query Image</h3>
+<br />
+<img src="@Model.PathToQueryImage" />
+<h3>Similar Images</h3>
+<br />
+@foreach (string img in Model.SimilarImages)
+{
+    <img src="@img" /><br />
+}

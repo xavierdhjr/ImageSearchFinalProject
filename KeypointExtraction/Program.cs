@@ -5,6 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Runtime.InteropServices;
+using System.IO;
+
+using System.Drawing;
+using System.Drawing.Drawing2D;
+
+using Adrian.Imaging.PGMConverter;
+using OpenSURFcs;
+
+using System.Runtime.InteropServices;
+
+using OpenCV.Net;
 
 namespace KeypointExtraction
 {
@@ -34,67 +45,69 @@ namespace KeypointExtraction
             public long random_seed;
         }
 
-
+        [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string CreateBagOfWords(float[] keypoint_data, int num_keypoints);
 
         [DllImport("FLANNDLL.dll", CallingConvention= CallingConvention.Cdecl)]
         public static extern void UpdateCluster(char[] sizeFile, char[] featureFile, char[] imgListFile, char[] clusterOutputFile, char[] bagOfWordsOutputDir);
 
         [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void UpdateClusterCenters(char[] sizeFile, char[] featureFile, char[] clusterOutputFile);
-
+        /*
         [DllImport("FLANNDLL.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string CreateBagOfWords();
+        public static extern string CreateBagOfWords();*/
         /*
         [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int* FindNearestNeighbors(char[] clusterFile, float[] imageQuery);
         */
-        static void Main(string[] args)
+        public static void doUpdateclusters()
         {
-            /*
-            IndexParameters indexParams = new IndexParameters();
-            FLANNParameters flannParams = new FLANNParameters();
-            float[] beans;
-            int rows = 5;
-            int cols = 5;
-            System.Random rnd = new Random();
-            float[][] doop = new float[rows][];
-            for (int i = 0; i < rows; ++i)
-            {
-                doop[i] = new float[cols];
-                for (int k = 0; k < cols; ++k)
-                {
-                    doop[i][k] = rnd.Next(0, rows);
-                }
-            }
-            int n = flann_compute_cluster_centers(doop, 1, 1, 1, out beans, ref indexParams, ref flannParams);*/
             char[] sizeFile = (Constants.PATH_TO_FEATURES + "/" + Constants.SIZE_FILE).ToCharArray();
             char[] featuresFile = (Constants.PATH_TO_FEATURES + "/" + Constants.FEATURES_FILE).ToCharArray();
             char[] imgListFile = (Constants.PATH_TO_FEATURES + "/" + Constants.IMGLIST_FILE).ToCharArray();
-            char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray());
-            /*
-            int dimensionality = 1259;
-            float[] query = new float[1259];
-            System.Random rng = new Random();
-            for (int i = 0; i < dimensionality; ++i)
-            {
-                query[i] = rng.Next(1259);
-            }*/
-            /*
-            var incoming = new int[1259];
+            char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray()); 
+            UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
+        }
 
-            
-            unsafe
+        public static void testImage()
+        {
+            List<string> similarImages = new List<string>();
+            string pgmFileName = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\queries\fc8ada11-7873-4a01-a75e-c4ecf485ac50.pgm";
+            Bitmap pgmConvertedToBitmap = PGMUtil.ToBitmap(pgmFileName);
+
+            IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
+            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 2, iimg);
+            Image tempImg = new Bitmap(pgmConvertedToBitmap);
+
+            SurfDescriptor.DecribeInterestPoints(ipts, false, true, iimg); // 128 length descriptor
+
+            int keypointSize = 0;
+            for (int i = 0; i < ipts.Count; ++i)
             {
-                int* result = FindNearestNeighbors(Constants.PATH_TO_CLUSTERS_FILE.ToCharArray(), query);
-                for (int i = 0; i < incoming.Length; ++i)
+                keypointSize += ipts[i].descriptorLength;
+
+            }
+
+            float[] keypoint_data = new float[keypointSize];
+            int k = 0;
+            for (int i = 0; i < ipts.Count; ++i)
+            {
+                for (int j = 0; j < ipts[i].descriptorLength; ++j)
                 {
-                    incoming[i] = result[i];
+                    keypoint_data[k] = ipts[i].descriptor[j];
+                    ++k;
                 }
-            }*/
-            //UpdateCluster(sizeFile, featuresFile, imgListFile, Constants.PATH_TO_CLUSTERS_FILE.ToCharArray(), Constants.PATH_TO_BAGOFWORDS.ToCharArray());
-            //UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
-            string soup = CreateBagOfWords();
+            }
+
+            string result = CreateBagOfWords(keypoint_data, keypointSize);
+
+        }
+
+        static void Main(string[] args)
+        {
+            doUpdateclusters();
         }
     }
 }
