@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BE556273-FB31-49CF-8615-EB9B04491634}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{01C1720D-DF9A-4D94-9529-511720A4F4C6}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KeypointExtraction</RootNamespace>
-    <AssemblyName>KeypointExtraction</AssemblyName>
+    <RootNamespace>OpenSurfcs</RootNamespace>
+    <AssemblyName>OpenSurfcs</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,10 +20,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,14 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenCV.Net">
-      <HintPath>..\packages\OpenCV.Net.3.0.0\lib\net40\OpenCV.Net.dll</HintPath>
+    <Reference Include="MathNet.Iridium, Version=2008.8.16.470, Culture=neutral, PublicKeyToken=c061a3ec32cc0c6f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\MathNet.Iridium.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,26 +44,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="FLANNClustering.cs" />
-    <Compile Include="Keypoint128.cs" />
-    <Compile Include="KeypointExtractor.cs" />
-    <Compile Include="PGMUtil.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="FastHessian.cs" />
+    <Compile Include="IntegralImage.cs" />
+    <Compile Include="IPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SurfDescriptor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="Properties\.svn\all-wcprops" />
+    <None Include="Properties\.svn\entries" />
+    <None Include="Properties\.svn\text-base\AssemblyInfo.cs.svn-base" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FLANNDLL.dll" />
+    <Content Include="MathNet.Iridium.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenSurfcs\OpenSurfcs.csproj">
-      <Project>{01c1720d-df9a-4d94-9529-511720a4f4c6}</Project>
-      <Name>OpenSurfcs</Name>
-    </ProjectReference>
+    <Folder Include="Properties\.svn\prop-base\" />
+    <Folder Include="Properties\.svn\props\" />
+    <Folder Include="Properties\.svn\tmp\prop-base\" />
+    <Folder Include="Properties\.svn\tmp\props\" />
+    <Folder Include="Properties\.svn\tmp\text-base\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
