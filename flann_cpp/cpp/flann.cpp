@@ -32,8 +32,12 @@ namespace {
     
     const char* algos[] = { "linear","kdtree", "kmeans", "composite" };
     const char* centers_algos[] = { "random", "gonzales", "kmeanspp" };
-
-	
+		
+	const char SIZES_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.size";
+	const char FEATURE_FILE[] ="C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.feature";
+	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\imglist.txt";
+	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
+	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.xb";
 	Params parametersToParams(IndexParameters parameters)
 	{
 		Params p;
@@ -137,7 +141,7 @@ void init_flann_parameters(FLANNParameters* p)
 
 void readSizes(vector<int>* outSizes)
 {
-	const char SIZES_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\features\\esp.size";
+
 	ifstream sizeFileStream;
 	sizeFileStream.open(SIZES_FILE);
 	
@@ -148,8 +152,7 @@ void readSizes(vector<int>* outSizes)
 		int i = 0;
 		while(!sizeFileStream.eof())
 		{
-			if(i > 50) // arbitrary limit to reduce time
-				break;
+			//if(i > 5) break;
 			int size;
 			sizeFileStream >> size;
 			(*outSizes).push_back(size);
@@ -164,10 +167,8 @@ void readSizes(vector<int>* outSizes)
 		return;
 	}
 }
-
 float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
 {
-	const char FEATURE_FILE[] ="C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\features\\esp.feature";
 	ifstream featureFileStream;
 	featureFileStream.open(FEATURE_FILE);
 	
@@ -200,10 +201,8 @@ float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
 	}
 	return data;
 }
-
 void readImageNames(vector<string>* outNames)
 {
-	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\features\\imglist.txt";
 	ifstream imageFileStream;
 	imageFileStream.open(IMAGELIST_FILE);
 	
@@ -214,8 +213,6 @@ void readImageNames(vector<string>* outNames)
 		int i = 0;
 		while(!imageFileStream.eof())
 		{
-			if(i > 50) // arbitrary limit to reduce time
-				break;
 			string size;
 			imageFileStream >> size;
 			(*outNames).push_back(size);
@@ -230,10 +227,26 @@ void readImageNames(vector<string>* outNames)
 		return;
 	}
 }
-
 void writeClusterData(float* cluster_centers, int clusters_returned, const int KEYPOINT_SIZE)
 {
-	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\clusters.txt";
+
+	FILE* file = fopen(CLUSTER_FILE_BINARY, "wb");
+	if(!file)
+	{
+		cout << "Could not open " << CLUSTER_FILE_BINARY << endl;
+	}
+	else
+	{
+		cout << "Writing clusters to binary file " << CLUSTER_FILE_BINARY << endl;
+		fwrite(&clusters_returned, sizeof(int), 1, file);
+		fwrite(&KEYPOINT_SIZE, sizeof(int), 1, file);
+		fwrite(cluster_centers, sizeof(float), clusters_returned * KEYPOINT_SIZE, file);
+		fclose(file);
+		cout << "Finished writing " << clusters_returned * KEYPOINT_SIZE << " dimensions to " << CLUSTER_FILE_BINARY << endl;
+	}
+
+
+	/*
 	ofstream clusterFileStream;
 	clusterFileStream.open(CLUSTER_FILE);
 	if(clusterFileStream.is_open())
@@ -255,9 +268,8 @@ void writeClusterData(float* cluster_centers, int clusters_returned, const int K
 	else
 	{
 		cout << "Could not open " << CLUSTER_FILE << endl;
-	}
+	}*/
 }
-
 void buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, int KEYPOINT_SIZE)
 {
 	IndexParameters build_index_params;
@@ -272,16 +284,36 @@ void buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters,
 	*outIndex = flann_build_index(cluster_centers,num_clusters,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
 	cout << "Build index. " << endl;
 }
-float* ReadClusterFile(char* clusterOutputFile, int* numClusters)
+
+float* ReadClusterFile(int* numClusters)
 {
-	std::ifstream fileStream;
-	fileStream.open(clusterOutputFile);
+	//std::ifstream fileStream;
+	//fileStream.open(CLUSTER_FILE);
+	
+	FILE* file = fopen(CLUSTER_FILE_BINARY, "rb");
+	if(!file)
+	{
+		cout << "Could not open " << CLUSTER_FILE_BINARY << endl;
+		return new float[0];
+	}	
+	
+	
+	cout << "Reading in cluster file " << CLUSTER_FILE_BINARY << endl;
 	int length = 0;
 	// Each line has a size on it
-	cout << clusterOutputFile << endl;
 	int total_point_dims;
 	int num_dimensions;
-	float* cluster_centers;
+
+	
+	fread(&total_point_dims,sizeof(int),1,file);
+	fread(&num_dimensions,sizeof(int),1,file);
+
+	int i = 0;
+	length = total_point_dims * num_dimensions;
+	float* cluster_centers = new float[length];
+	fread(cluster_centers, sizeof(float), length, file);
+
+	/*
 	if(fileStream.is_open())
 	{
 
@@ -295,100 +327,40 @@ float* ReadClusterFile(char* clusterOutputFile, int* numClusters)
 		int i = 0;
 		std::string str;
 		float dim = 0;
-		cout << "haha" << endl;
+		cout << "Reading cluster centers from " << CLUSTER_FILE  << endl;
 		while(i < length)
 		{	
-			for(int k = 0; k < 100000 && i < length; ++k)
-			{
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				//cout << dim << endl;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-
-				fileStream >> dim;
-				cluster_centers[i] = dim;
-				++i;
-			}
-			double percent_complete = (double)i / (double)length;
-			printf("Read %16f%% of keypoint dimensions (%d / %d).\n", percent_complete * 100, i, length);
+			//for(int k = 0; i < length; ++k)
+			//{
+			fileStream >> cluster_centers[i++];
+			//}
+			//double percent_complete = (double)i / (double)length;
+			//printf("Read %16f%% of keypoint dimensions (%d / %d).\n", percent_complete * 100, i, length);
 
 		}
 	}else
 	{
-		std::cout << "Error opening file " << clusterOutputFile << std::endl;
+		std::cout << "Error opening file " << CLUSTER_FILE << std::endl;
 		return 0;
 	}
-
+	*/
+	
 
 	*numClusters = total_point_dims; // set value of numClusters to length
 	std::cout << "Finished reading cluster file. Read " << length << " sizes." << std::endl;
-	fileStream.close();
+	//fileStream.close();
 	return cluster_centers;
 }
-/*
-EXPORTED char* CreateBagOfWords()
-{
-    char szSampleString[] = "Hello World";
-    ULONG ulSize = strlen(szSampleString) + sizeof(char);
-    char* pszReturn = NULL;
 
-    pszReturn = (char*)::CoTaskMemAlloc(ulSize);
-    // Copy the contents of szSampleString
-    // to the memory pointed to by pszReturn.
-    strcpy(pszReturn, szSampleString);
-    // Return pszReturn.
-    return pszReturn;
-}*/
-char* sayBeans()
-{
-	//const char* szSampleString = strStream.str().c_str();
-	char szSampleString[] = "beans";
-    ULONG ulSize = strlen(szSampleString) + sizeof(char);
-    char* pszReturn = NULL;
-
-    pszReturn = (char*)::CoTaskMemAlloc(ulSize);
-    // Copy the contents of szSampleString
-    // to the memory pointed to by pszReturn.
-    strcpy(pszReturn, szSampleString);
-    // Return pszReturn.
-    return pszReturn;
-}
 
 EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 {	
 
-
-	char CLUSTER_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\clusters.txt";
 	int num_clusters;
 	//float* cluster_centers = (float*)::CoTaskMemAlloc(4609 * 128 * sizeof(float));
-		cout << "ha" << endl;
-	float* cluster_centers = ReadClusterFile(CLUSTER_FILE, &num_clusters);
 
+	float* cluster_centers = ReadClusterFile(&num_clusters);
+	
 	FLANN_INDEX index;
 
 	buildIndex(&index, cluster_centers, num_clusters, 128);
@@ -403,7 +375,7 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 	flann_params.random_seed = CENTERS_RANDOM;
 
 	strStream << "<DOC>" << endl;
-	strStream << "<DOCNO>" << "beans" << "</DOCNO>" << endl;
+	strStream << "<DOCNO>" << "Query" << "</DOCNO>" << endl;
 	strStream << "<TEXT>" << endl;
 
 	int keypoints_examined = 0;
@@ -424,20 +396,22 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 	strStream << "</DOC>" << endl;
 
 	cout << "Wrote out " << keypoints_examined << " keypoints." << endl;
-
+	
 	const char* szSampleString = strStream.str().c_str();
-	cout << strStream.str() << endl;
-	cout << strStream.str().c_str() << endl;
+	//cout << strStream.str() << endl;
+	//cout << strStream.str().c_str() << endl;
     ULONG ulSize = strlen(szSampleString) + sizeof(char);
-	cout << strlen(szSampleString) << endl;
+	//cout << strlen(szSampleString) << endl;
+	
     char* pszReturn = NULL;
 
     pszReturn = (char*)::CoTaskMemAlloc(ulSize);
     // Copy the contents of szSampleString
     // to the memory pointed to by pszReturn.
     strcpy(pszReturn, strStream.str().c_str());
-	cout << pszReturn << endl;
+	//cout << pszReturn << endl;
     // Return pszReturn.
+	
     return pszReturn;
 }
 
@@ -447,16 +421,8 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 	/*
 		Read in keypoints
 	*/
-
-	const char FEATURE_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\features\\esp.feature";
-	const char SIZES_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\features\\esp.size";
-	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\clusters.txt";
-	const char BAGOWORDS_FILE[] = "C:\\Users\\Raider\\ImageSearchFinalProject\\cse484project\\bagofwords\\bagofwords.txt";
-
+	const char BAGOWORDS_FILE[] = { "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\bagofwords\\bagofwords.txt" };
 	const int KEYPOINT_SIZE = 128;
-
-	ifstream sizeFileStream;
-	sizeFileStream.open(SIZES_FILE);
 
 	vector<int> sizes;
 	readSizes(&sizes);
@@ -476,7 +442,8 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 		Call FLANN Library
 
 	*/
-	const int CLUSTERS = 1500000;
+	/*
+	const int CLUSTERS = 150000;
 	IndexParameters index_params;
 	index_params.algorithm = KMEANS;
 	index_params.checks = 2048;
@@ -487,12 +454,16 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 	index_params.target_precision = -1;
 	index_params.build_weight = 0.01;
 	index_params.memory_weight = 1;
-	float* cluster_centers = new float[CLUSTERS * KEYPOINT_SIZE];
+	LPVOID d = HeapAlloc(GetProcessHeap(), HEAP_GENERATE_EXCEPTIONS, sizeof(float) * CLUSTERS * KEYPOINT_SIZE); //
+	float* cluster_centers = (float*)d; 
 	int flann_result = flann_compute_cluster_centers(flann_data, total_keypoints, KEYPOINT_SIZE, CLUSTERS, cluster_centers, &index_params, NULL);
 	cout << "Flann result: " << flann_result << endl;
 	
 	int clusters_returned = flann_result;
 	writeClusterData(cluster_centers, clusters_returned, KEYPOINT_SIZE);
+	*/
+	int clusters_returned;
+	float* cluster_centers = ReadClusterFile(&clusters_returned);
 
 	IndexParameters build_index_params;
 	build_index_params.algorithm = KDTREE;
@@ -530,6 +501,7 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 			bagOfWordsStream << "<TEXT>" << endl;
 
 			int keypoints_i = sizes[i];
+
 			for(int j = 0; j < sizes[i]; ++j)
 			{
 				float* keypoint = new float[KEYPOINT_SIZE];
@@ -541,9 +513,15 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 				int* nearest_neighbor = new int[1];
 				int _r = flann_find_nearest_neighbors_index(index,keypoint,1,nearest_neighbor,1,1024,&flann_params);
 				bagOfWordsStream << "w" << nearest_neighbor[0] << " ";
+				delete keypoint;
+				delete nearest_neighbor;
 			}
 			bagOfWordsStream << endl << "</TEXT>" << endl;
 			bagOfWordsStream << "</DOC>" << endl;
+
+
+
+
 			
 		}
 		cout << "Wrote " << sizes.size() << " bag of words documents." << endl;
@@ -554,7 +532,8 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 		cout << "There was a problem opening " << BAGOWORDS_FILE << endl;
 	}
 
-	
+	delete flann_data;
+	delete cluster_centers;
 }
 
 EXPORTED void flann_log_verbosity(int level)

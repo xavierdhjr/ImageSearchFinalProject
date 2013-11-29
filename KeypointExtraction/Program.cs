@@ -67,14 +67,15 @@ namespace KeypointExtraction
             char[] sizeFile = (Constants.PATH_TO_FEATURES + "/" + Constants.SIZE_FILE).ToCharArray();
             char[] featuresFile = (Constants.PATH_TO_FEATURES + "/" + Constants.FEATURES_FILE).ToCharArray();
             char[] imgListFile = (Constants.PATH_TO_FEATURES + "/" + Constants.IMGLIST_FILE).ToCharArray();
-            char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray()); 
-            UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
+            char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray());
+            testImage();
+            //UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
         }
 
         public static void testImage()
         {
             List<string> similarImages = new List<string>();
-            string pgmFileName = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\queries\fc8ada11-7873-4a01-a75e-c4ecf485ac50.pgm";
+            string pgmFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\5db64103-80f1-4787-96ae-faa730dc87b9.pgm";
             Bitmap pgmConvertedToBitmap = PGMUtil.ToBitmap(pgmFileName);
 
             IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);

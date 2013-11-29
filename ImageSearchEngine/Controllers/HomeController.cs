@@ -25,8 +25,8 @@ namespace ImageSearchEngine.Controllers
         //
         // GET: /Home/
 
-        const string INDEX_DIRECTORY = @"C:\Users\Raider\ImageSearchFinalProject\LuceneIndex\Index";
-        const string DOCUMENT_DIRECTORY = @"C:\Users\Raider\ImageSearchFinalProject\cse484project\bagofwords";
+        const string INDEX_DIRECTORY = @"C:\Users\Raider\Desktop\MSU\FS13\CSE484\project\index";
+        const string DOCUMENT_DIRECTORY = @"C:\Users\Raider\Desktop\MSU\FS13\CSE484\project\bagofwords";
 
         public ActionResult IndexDocuments()
         {
@@ -146,8 +146,13 @@ namespace ImageSearchEngine.Controllers
             SimilarImageResult result = new SimilarImageResult();
             result.SimilarImages = new List<string>();
             result.PathToQueryImage = Url.Content(queryFolder + queryId.ToString() + ".png");
+            int numImages = 0;
+            int imageCap = 10;
             foreach (string str in results)
             {
+                if (numImages >= imageCap) 
+                    break;
+
                 result.SimilarImages.Add(Url.Content(Constants.VIRTUALPATH_TO_IMAGES + str));
             }
             

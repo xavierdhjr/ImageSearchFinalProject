@@ -132,7 +132,7 @@ namespace KeypointExtraction
         public static string GetBagOfWords(Stream inputStream, Guid queryId, string saveQueryPath)
         {
 
-            /*
+            
             List<string> similarImages = new List<string>();
             string pgmFileName = saveQueryPath + queryId + ".pgm";
             string keyFile = pgmFileName + ".key";
@@ -148,13 +148,13 @@ namespace KeypointExtraction
             {
                 pgmConvertedToBitmap.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
             }
-          
+          /*
             IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
             List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 1, iimg);
             Image tempImg = new Bitmap(pgmConvertedToBitmap);
 
             SurfDescriptor.DecribeInterestPoints(ipts, false, true, iimg); // 128 length descriptor
-
+            
             int keypointSize = 0;
             for (int i = 0; i < ipts.Count; ++i)
             {
@@ -178,7 +178,39 @@ namespace KeypointExtraction
             }
             */
             string result = "";
-            using (FileStream fs = File.Open(@"C:\Users\Raider\ImageSearchFinalProject\cse484project\sample query\query2.key", FileMode.Open, FileAccess.Read))
+            /*
+            ProcessStartInfo siftInfo = new ProcessStartInfo()
+            {
+                FileName = "cmd.exe",
+                Arguments = "/c \"" + HttpContext.Current.Server.MapPath("~/siftWin32") + "\" < " + pgmFileName + " > " + keyFile,
+                UseShellExecute = false,
+                WorkingDirectory = HttpContext.Current.Server.MapPath("~/"),
+                //RedirectStandardInput = true
+            };
+
+            Process proc = Process.Start(siftInfo);
+            proc.BeginOutputReadLine();
+            proc.WaitForExit();
+            */
+            /*
+            Process siftProcess = new Process();
+            siftProcess.StartInfo.FileName = HttpContext.Current.Server.MapPath("~/siftWin32.exe");
+            siftProcess.StartInfo.UseShellExecute = false;
+            siftProcess.StartInfo.CreateNoWindow = true;
+            siftProcess.StartInfo.RedirectStandardOutput = true;
+            siftProcess.StartInfo.RedirectStandardInput = true;
+            siftProcess.StartInfo.RedirectStandardError = true;
+            siftProcess.Start();
+            
+            StreamWriter inputWriter = siftProcess.StandardInput;
+            inputWriter.AutoFlush = true;
+            inputWriter.Write(File.ReadAllLines(pgmFileName));
+            siftProcess.WaitForExit();
+            StreamReader outputReader = siftProcess.StandardOutput;
+            inputWriter.Flush();
+            siftProcess.WaitForExit();
+            string res = outputReader.ReadToEnd();*/
+            using (FileStream fs = File.Open(HttpContext.Current.Server.MapPath("~/queries/01240b40-4f98-4951-8a14-497ce82dedc7.pgm.key"), FileMode.Open, FileAccess.Read))
             {
                 StreamReader reader = new StreamReader(fs);
                 string line = reader.ReadLine();
