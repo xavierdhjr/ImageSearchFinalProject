@@ -41,10 +41,10 @@ namespace KeypointExtraction
 
             Bitmap pgmConvertedToBitmap = PGMUtil.ToBitmap(pgmFileName);
             IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
-            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 2, iimg);
+            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 1, iimg);
             Image tempImg = new Bitmap(pgmConvertedToBitmap);
 
-            SurfDescriptor.DecribeInterestPoints(ipts, false, true, iimg); // 128 length descriptor
+            SurfDescriptor.DecribeInterestPoints(ipts, true, true, iimg); // 128 length descriptor
 
             /*
              * The file format starts with 2 integers giving the total number of
@@ -132,6 +132,7 @@ namespace KeypointExtraction
         public static string GetBagOfWords(Stream inputStream, Guid queryId, string saveQueryPath)
         {
 
+            /*
             List<string> similarImages = new List<string>();
             string pgmFileName = saveQueryPath + queryId + ".pgm";
             string keyFile = pgmFileName + ".key";
@@ -149,7 +150,7 @@ namespace KeypointExtraction
             }
           
             IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
-            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 2, iimg);
+            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 1, iimg);
             Image tempImg = new Bitmap(pgmConvertedToBitmap);
 
             SurfDescriptor.DecribeInterestPoints(ipts, false, true, iimg); // 128 length descriptor
@@ -161,6 +162,7 @@ namespace KeypointExtraction
                 for (int z = 0; z < ipts[i].descriptorLength; ++z)
                 {
                     ipts[i].descriptor[z] *= 1000;
+                    //ipts[i].descriptor[z] = Math.Abs(ipts[i].descriptor[z]);
                 }
             }
 
@@ -174,9 +176,43 @@ namespace KeypointExtraction
                     ++k;
                 }
             }
+            */
+            string result = "";
+            using (FileStream fs = File.Open(@"C:\Users\Raider\ImageSearchFinalProject\cse484project\sample query\query2.key", FileMode.Open, FileAccess.Read))
+            {
+                StreamReader reader = new StreamReader(fs);
+                string line = reader.ReadLine();
+                string[] keypointsAndDimensionality = line.Split(' ');
+                int keypoints = int.Parse(keypointsAndDimensionality[0]);
+                int dimensionality = int.Parse(keypointsAndDimensionality[1]);
 
-            string result = CreateBagOfWords(keypoint_data, keypointSize);
+                float[] keypoint_data = new float[keypoints * dimensionality];
+                int keypointSize = keypoints * dimensionality;
 
+                int keypoints_left = keypoints;
+                int k = 0;
+                while (keypoints_left > 0)
+                {
+                    string blah = reader.ReadLine(); // orientation, scale, etc.
+                    int dim = dimensionality;
+                    while (dim > 0)
+                    {
+                        string important = reader.ReadLine();
+                        string[] pieceOfVector = important.Split(' ');
+                        for (int i = 0; i < pieceOfVector.Length; ++i)
+                        {
+                            if (pieceOfVector[i].Length <= 0) continue;
+                            if (pieceOfVector[i] == " ") continue;
+                            keypoint_data[k] = float.Parse(pieceOfVector[i]);
+                            dim--;
+                            k++;
+                        }
+                    }
+
+                    keypoints_left--;
+                }
+                result = CreateBagOfWords(keypoint_data, keypointSize);
+            }
             return result;
         }
 
