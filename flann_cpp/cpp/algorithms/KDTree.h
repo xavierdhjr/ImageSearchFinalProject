@@ -55,6 +55,10 @@ const int RAND_DIM=5;
  */
 class KDTree : public NNIndex
 {	
+	
+
+public:
+	
 	/**
 	 * Number of randomized trees that are used
 	 */
@@ -131,10 +135,6 @@ class KDTree : public NNIndex
 	 */
 	PooledAllocator pool;
 
-
-
-public:
-	
     const char* name() const
     {
         return "kdtree";

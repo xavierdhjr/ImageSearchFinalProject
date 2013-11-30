@@ -91,6 +91,8 @@ namespace ImageSearchEngine.Controllers
 
         public ActionResult Query(HttpPostedFileBase queryImage)
         {
+            DateTime start = DateTime.Now;
+
             Guid queryId = Guid.NewGuid();
             string winSiftFileName = "~/siftWin32.exe";
             string pathToWinSift = HttpContext.Server.MapPath(winSiftFileName);
@@ -154,8 +156,13 @@ namespace ImageSearchEngine.Controllers
                     break;
 
                 result.SimilarImages.Add(Url.Content(Constants.VIRTUALPATH_TO_IMAGES + str));
+                numImages++;
             }
-            
+            TimeSpan timeItTook = DateTime.Now - start;
+
+            result.QueryTimeSeconds = (int)timeItTook.TotalSeconds;
+            result.QueryTimeMilliseconds = (int)timeItTook.TotalMilliseconds;
+
             return View(result);
             /*
             string keyFile = KeypointExtractor.ConvertPGMToKeyPoints(queryImage.InputStream, queryId, pathToWinSift, pathToQueryFolder);
@@ -172,6 +179,8 @@ namespace ImageSearchEngine.Controllers
         {
             public string PathToQueryImage;
             public List<string> SimilarImages;
+            public int QueryTimeSeconds;
+            public int QueryTimeMilliseconds;
         }
 
     }

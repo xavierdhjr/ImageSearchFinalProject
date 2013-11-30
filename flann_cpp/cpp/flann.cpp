@@ -38,6 +38,7 @@ namespace {
 	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\imglist.txt";
 	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
 	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.xb";
+	const char FLANN_INDEX_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\flann_index.xb";
 	Params parametersToParams(IndexParameters parameters)
 	{
 		Params p;
@@ -139,6 +140,72 @@ void init_flann_parameters(FLANNParameters* p)
 	//printf("yup\n");
 }
 
+NNIndex* flann_build_nnindex(float* dataset, int rows, int cols, float* speedup, IndexParameters* index_params, FLANNParameters* flann_params)
+{
+	try {
+
+		init_flann_parameters(flann_params);
+		//printf("finished init\n");
+		DatasetPtr inputData = new Dataset<float>(rows,cols,dataset);
+		//printf("finished input data setup\n");
+		if (index_params == NULL) {
+			throw FLANNException("The index_params agument must be non-null");
+		}
+
+		float target_precision = index_params->target_precision;
+        float build_weight = index_params->build_weight;
+        float memory_weight = index_params->memory_weight;
+        float sample_fraction = index_params->sample_fraction;
+		//printf("init'd vars\n");
+		NNIndex* index = NULL;
+		if (target_precision < 0) {
+			Params params = parametersToParams(*index_params);
+			logger.info("Building index\n");
+			index = create_index((const char *)params["algorithm"],*inputData,params);
+            StartStopTimer t;
+            t.start();
+
+				//printf("About to build index\n");
+
+            index->buildIndex();
+
+				//printf("built index in %3f second\n", t.value);
+
+            t.stop();
+            logger.info("Building index took: %g\n",t.value);
+		}
+		else {
+            if (index_params->build_weight < 0) {
+                throw FLANNException("The index_params.build_weight must be positive.");
+            }
+            
+            if (index_params->memory_weight < 0) {
+                throw FLANNException("The index_params.memory_weight must be positive.");
+            }
+            Autotune autotuner(index_params->build_weight, index_params->memory_weight, index_params->sample_fraction);    
+			Params params = autotuner.estimateBuildIndexParams(*inputData, target_precision);
+			index = create_index((const char *)params["algorithm"],*inputData,params);
+			index->buildIndex();
+			autotuner.estimateSearchParams(*index,*inputData,target_precision,params);
+
+			*index_params = paramsToParameters(params);
+			index_params->target_precision = target_precision;
+            index_params->build_weight = build_weight;
+            index_params->memory_weight = memory_weight;
+            index_params->sample_fraction = sample_fraction;
+            
+			if (speedup != NULL) {
+				*speedup = float(params["speedup"]);
+			}
+		}
+
+		return index;
+	}
+	catch (runtime_error& e) {
+		logger.error("Caught exception: %s\n",e.what());
+		return NULL;
+	}
+}
 void readSizes(vector<int>* outSizes)
 {
 
@@ -246,31 +313,8 @@ void writeClusterData(float* cluster_centers, int clusters_returned, const int K
 	}
 
 
-	/*
-	ofstream clusterFileStream;
-	clusterFileStream.open(CLUSTER_FILE);
-	if(clusterFileStream.is_open())
-	{
-		cout << "Successfully opened " << CLUSTER_FILE << endl;
-		clusterFileStream << clusters_returned << endl;
-		clusterFileStream << KEYPOINT_SIZE << endl;
-
-		for(int i = 0; i < clusters_returned; ++i)
-		{
-			for(int k = 0; k < KEYPOINT_SIZE; ++k)
-			{
-				clusterFileStream << cluster_centers[i * KEYPOINT_SIZE + k] << " ";
-			}
-			clusterFileStream << endl;
-		}
-		cout << "Wrote " << clusters_returned << " cluster centers to file." << endl;
-	}
-	else
-	{
-		cout << "Could not open " << CLUSTER_FILE << endl;
-	}*/
 }
-void buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, int KEYPOINT_SIZE)
+int buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, int KEYPOINT_SIZE)
 {
 	IndexParameters build_index_params;
 	build_index_params.algorithm = KDTREE;
@@ -281,8 +325,10 @@ void buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters,
 	build_index_params.memory_weight = 1;
 
 	float speedup;
-	*outIndex = flann_build_index(cluster_centers,num_clusters,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
+	NNIndex* index = flann_build_nnindex(cluster_centers,num_clusters,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
+	*outIndex = index;
 	cout << "Build index. " << endl;
+	return index->usedMemory();
 }
 
 float* ReadClusterFile(int* numClusters)
@@ -313,38 +359,6 @@ float* ReadClusterFile(int* numClusters)
 	float* cluster_centers = new float[length];
 	fread(cluster_centers, sizeof(float), length, file);
 
-	/*
-	if(fileStream.is_open())
-	{
-
-
-		fileStream >> total_point_dims;
-		fileStream >> num_dimensions;
-		length = total_point_dims * num_dimensions;
-		
-		cluster_centers = new float[length];
-
-		int i = 0;
-		std::string str;
-		float dim = 0;
-		cout << "Reading cluster centers from " << CLUSTER_FILE  << endl;
-		while(i < length)
-		{	
-			//for(int k = 0; i < length; ++k)
-			//{
-			fileStream >> cluster_centers[i++];
-			//}
-			//double percent_complete = (double)i / (double)length;
-			//printf("Read %16f%% of keypoint dimensions (%d / %d).\n", percent_complete * 100, i, length);
-
-		}
-	}else
-	{
-		std::cout << "Error opening file " << CLUSTER_FILE << std::endl;
-		return 0;
-	}
-	*/
-	
 
 	*numClusters = total_point_dims; // set value of numClusters to length
 	std::cout << "Finished reading cluster file. Read " << length << " sizes." << std::endl;
@@ -352,6 +366,56 @@ float* ReadClusterFile(int* numClusters)
 	return cluster_centers;
 }
 
+void writeIndexFile(FLANN_INDEX index, int sizeBytes)
+{
+	/*
+	FILE* file = fopen(FLANN_INDEX_BINARY, "wb");
+	//NNIndex* nnIndex = (NNIndex*)(index);
+	if(!file)
+	{
+		cout << "Could not open " << FLANN_INDEX_BINARY << endl;
+	}
+	else
+	{
+		KDTree* tree = (KDTree*)(&index);
+		Dataset<float> treeDataset = tree->dataset;
+		float* mean = tree->mean;
+		int numTrees = tree->numTrees;
+		//fwrite(&sizeBytes, sizeof(int), 1, file);
+		//fwrite(, sizeBytes, 1, file);
+		//fwrite(&KEYPOINT_SIZE, sizeof(int), 1, file);
+		//fwrite(cluster_centers, sizeof(float), clusters_returned * KEYPOINT_SIZE, file);
+		fclose(file);
+		cout << "Finished writing " << sizeBytes << " bytes to " << FLANN_INDEX_BINARY << endl;
+	}*/
+}
+
+FLANN_INDEX readIndexFile()
+{
+
+	/*
+	FILE* file = fopen(FLANN_INDEX_BINARY, "rb");
+	FLANN_INDEX outIndex;
+	if(!file)
+	{
+		cout << "Could not open " << FLANN_INDEX_BINARY << endl;
+		return outIndex;
+	}
+	else
+	{
+		cout << "Reading FLANN_INDEX from binary file " << FLANN_INDEX_BINARY << endl;
+		int memoryUsed =0;
+		fread(&memoryUsed, sizeof(int), 1, file);
+		outIndex = (FLANN_INDEX)malloc(memoryUsed);
+		fread(outIndex, memoryUsed, 1, file);
+		cout << "Finished reading " << memoryUsed << " bytes from " << FLANN_INDEX_BINARY << endl;
+		fclose(file);
+		return outIndex;
+
+	}
+	*/
+
+}
 
 EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 {	
@@ -360,13 +424,17 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 	//float* cluster_centers = (float*)::CoTaskMemAlloc(4609 * 128 * sizeof(float));
 
 	float* cluster_centers = ReadClusterFile(&num_clusters);
-	
 	FLANN_INDEX index;
+	
+	int indexSizeBytes = buildIndex(&index, cluster_centers, num_clusters, 128);
 
-	buildIndex(&index, cluster_centers, num_clusters, 128);
-
+	/*
+	writeIndexFile(index2, indexSizeBytes);
+	FLANN_INDEX index = (readIndexFile()); // works when both read and write are present probably because its pointing to the same place
+	// in memory where a valid FLANN index is...
+	*/
 	stringstream strStream;
-
+	
 	cout << "Writing bag of words. " << endl;
 
 	FLANNParameters flann_params;

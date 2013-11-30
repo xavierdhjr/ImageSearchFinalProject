@@ -135,82 +135,61 @@ namespace KeypointExtraction
             
             List<string> similarImages = new List<string>();
             string pgmFileName = saveQueryPath + queryId + ".pgm";
-            string keyFile = pgmFileName + ".key";
+            string keyFileName = pgmFileName + ".key";
             string pngFileName = saveQueryPath + queryId + ".png";
 
             using (FileStream file = new FileStream(pgmFileName, FileMode.Create, FileAccess.ReadWrite))
             {
                 inputStream.CopyTo(file);
             }
-
+            
             Bitmap pgmConvertedToBitmap = PGMUtil.ToBitmap(pgmFileName);
             using (FileStream fs = File.Open(pngFileName, FileMode.OpenOrCreate))
             {
                 pgmConvertedToBitmap.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
             }
-          /*
-            IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
-            List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 1, iimg);
-            Image tempImg = new Bitmap(pgmConvertedToBitmap);
 
-            SurfDescriptor.DecribeInterestPoints(ipts, false, true, iimg); // 128 length descriptor
-            
-            int keypointSize = 0;
-            for (int i = 0; i < ipts.Count; ++i)
-            {
-                keypointSize += ipts[i].descriptorLength;
-                for (int z = 0; z < ipts[i].descriptorLength; ++z)
-                {
-                    ipts[i].descriptor[z] *= 1000;
-                    //ipts[i].descriptor[z] = Math.Abs(ipts[i].descriptor[z]);
-                }
-            }
 
-            float[] keypoint_data = new float[keypointSize];
-            int k = 0;
-            for (int i = 0; i < ipts.Count; ++i)
-            {
-                for (int j = 0; j < ipts[i].descriptorLength; ++j)
-                {
-                    keypoint_data[k] = ipts[i].descriptor[j];
-                    ++k;
-                }
-            }
-            */
-            string result = "";
-            /*
+            string pathToSift = HttpContext.Current.Server.MapPath(@"~\siftWin32.exe");
+
             ProcessStartInfo siftInfo = new ProcessStartInfo()
             {
-                FileName = "cmd.exe",
-                Arguments = "/c \"" + HttpContext.Current.Server.MapPath("~/siftWin32") + "\" < " + pgmFileName + " > " + keyFile,
-                UseShellExecute = false,
-                WorkingDirectory = HttpContext.Current.Server.MapPath("~/"),
-                //RedirectStandardInput = true
+                FileName = pathToSift,
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false
             };
+            Console.WriteLine("Starting SIFT: ");
+            Process sift = Process.Start(siftInfo);
+            sift.EnableRaisingEvents = true;
 
-            Process proc = Process.Start(siftInfo);
-            proc.BeginOutputReadLine();
-            proc.WaitForExit();
-            */
-            /*
-            Process siftProcess = new Process();
-            siftProcess.StartInfo.FileName = HttpContext.Current.Server.MapPath("~/siftWin32.exe");
-            siftProcess.StartInfo.UseShellExecute = false;
-            siftProcess.StartInfo.CreateNoWindow = true;
-            siftProcess.StartInfo.RedirectStandardOutput = true;
-            siftProcess.StartInfo.RedirectStandardInput = true;
-            siftProcess.StartInfo.RedirectStandardError = true;
-            siftProcess.Start();
-            
-            StreamWriter inputWriter = siftProcess.StandardInput;
-            inputWriter.AutoFlush = true;
-            inputWriter.Write(File.ReadAllLines(pgmFileName));
-            siftProcess.WaitForExit();
-            StreamReader outputReader = siftProcess.StandardOutput;
-            inputWriter.Flush();
-            siftProcess.WaitForExit();
-            string res = outputReader.ReadToEnd();*/
-            using (FileStream fs = File.Open(HttpContext.Current.Server.MapPath("~/queries/01240b40-4f98-4951-8a14-497ce82dedc7.pgm.key"), FileMode.Open, FileAccess.Read))
+            using (StreamReader readPgmFile = new StreamReader(pgmFileName))
+            {
+                sift.StandardInput.WriteLine(readPgmFile.ReadToEnd());
+                sift.StandardInput.Flush();
+                sift.StandardInput.Close();
+            }
+
+            using (Program.KeyFileWriter writer = new Program.KeyFileWriter(keyFileName))
+            {
+                sift.OutputDataReceived += writer.ReceiveData;
+                sift.BeginOutputReadLine();
+                sift.WaitForExit();
+            }
+            //string result = sift.StandardOutput.ReadToEnd();
+            sift.Close();
+
+            float[] keypoints = ReadKeyFile(keyFileName);
+
+            string result = CreateBagOfWords(keypoints, keypoints.Length);
+
+            return result;
+        }
+
+        public static float[] ReadKeyFile(string keyFilePath)
+        {
+            float[] keypoint_data = new float[0];
+            using (FileStream fs = File.Open(keyFilePath, FileMode.Open, FileAccess.Read))
             {
                 StreamReader reader = new StreamReader(fs);
                 string line = reader.ReadLine();
@@ -218,7 +197,7 @@ namespace KeypointExtraction
                 int keypoints = int.Parse(keypointsAndDimensionality[0]);
                 int dimensionality = int.Parse(keypointsAndDimensionality[1]);
 
-                float[] keypoint_data = new float[keypoints * dimensionality];
+                keypoint_data = new float[keypoints * dimensionality];
                 int keypointSize = keypoints * dimensionality;
 
                 int keypoints_left = keypoints;
@@ -243,9 +222,9 @@ namespace KeypointExtraction
 
                     keypoints_left--;
                 }
-                result = CreateBagOfWords(keypoint_data, keypointSize);
             }
-            return result;
+
+            return keypoint_data;
         }
 
     }

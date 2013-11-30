@@ -2,16 +2,36 @@
     ViewBag.Title = "Query";
 }
 
+<style type="text/css">
+    .results
+    {
+        width:500px;
+    }
+    .results div
+    {
+        float: left;
+    }
+</style>
+
 <h2>Query</h2>
 
 @model ImageSearchEngine.Controllers.HomeController.SimilarImageResult
+
+<div>
+    Query took @Model.QueryTimeSeconds seconds.
+    Query took @Model.QueryTimeMilliseconds ms.
+</div>
 
 <h3>Query Image</h3>
 <br />
 <img src="@Model.PathToQueryImage" />
 <h3>Similar Images</h3>
 <br />
-@foreach (string img in Model.SimilarImages)
-{
-    <img src="@img" /><br />
-}
+<div class="results">
+    @foreach (string img in Model.SimilarImages)
+    {
+    
+        <div><img src="@img" /></div>
+    }
+    <div style="clear:both;"></div>
+</div>

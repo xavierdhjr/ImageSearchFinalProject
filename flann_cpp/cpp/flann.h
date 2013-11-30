@@ -86,7 +86,6 @@ Returns: the newly created index or a number <0 for error
 */
 LIBSPEC FLANN_INDEX flann_build_index(float* dataset, int rows, int cols, float* speedup, struct IndexParameters* index_params, struct FLANNParameters* flann_params);
 
-
 /**
 Builds an index and uses it to find nearest neighbors.
 
