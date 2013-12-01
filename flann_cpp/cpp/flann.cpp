@@ -414,7 +414,7 @@ FLANN_INDEX readIndexFile()
 
 	}
 	*/
-
+	return 0x0;
 }
 
 EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)

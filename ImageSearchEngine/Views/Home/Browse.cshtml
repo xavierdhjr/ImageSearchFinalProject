@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "Browse";
+}
+@using ImageSearchEngine.Controllers
+@model List<HomeController.BrowseImageResult>
+
+<style type="text/css">
+    .browse-image
+    {   
+        float:left;
+        margin:10px;
+    }
+    .browse-images-wrapper
+    {
+        width:500px;
+    }
+</style>
+
+<h2>Browse</h2>
+
+
+<div class="browse-images-wrapper">
+    @foreach (HomeController.BrowseImageResult result in Model)
+    {
+        <a href="/Home/FindSimilar?docid=@result.ImageIndexId">
+            <div class="browse-image" >
+                <img src="@result.PathToImage" />
+            </div>
+        </a>
+    }
+
+    <div style="clear:both;"></div>
+</div>

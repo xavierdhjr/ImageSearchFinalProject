@@ -21,12 +21,81 @@ namespace ImageSearchEngine.Controllers
 {
     public class HomeController : Controller
     {
-        
+        private class NoNormSimilarity : Similarity
+        {
+            public override float ComputeNorm(string field, FieldInvertState state)
+            {
+                return 1;
+            }
+
+            public override float Idf(int docFreq, int numDocs)
+            {
+                //float retval =  (1 + (numDocs - docFreq + 0.5f)) / docFreq + 1;
+                return 1;
+            }
+            public override float SloppyFreq(int distance)
+            {
+                return 1;
+            }
+
+            public override float Coord(int overlap, int maxOverlap)
+            {
+                return 1;
+            }
+
+            public override float Tf(float freq)
+            {
+                return 1;
+            }
+
+            public override float QueryNorm(float sumOfSquaredWeights)
+            {
+                return 1;
+            }
+
+            public override float LengthNorm(string fieldName, int numTokens)
+            {
+                return 1;
+            }
+        }
         //
         // GET: /Home/
 
         const string INDEX_DIRECTORY = @"C:\Users\Raider\Desktop\MSU\FS13\CSE484\project\index";
         const string DOCUMENT_DIRECTORY = @"C:\Users\Raider\Desktop\MSU\FS13\CSE484\project\bagofwords";
+
+        Similarity similarity;
+
+        public HomeController()
+        {
+            //similarity = new NoNormSimilarity();
+            similarity = new DefaultSimilarity();
+        }
+
+        public ActionResult Browse(int page = 0,int results = 20)
+        {
+            IndexReader reader = DirectoryReader.Open(FSDirectory.Open(INDEX_DIRECTORY), true);
+
+            List<Document> documents = new List<Document>();
+            List<BrowseImageResult> imagePaths = new List<BrowseImageResult>();
+
+            int offset = page * results;
+            int i = 0;
+            while (i < results)
+            {
+                imagePaths.Add
+                (
+                    new BrowseImageResult()
+                    {
+                    PathToImage = Url.Content(Constants.VIRTUALPATH_TO_IMAGES + reader.Document(i + offset).Get("docno")),
+                    ImageIndexId = i + offset
+                    }
+                );
+                i++;
+            }
+
+            return View(imagePaths);
+        }
 
         public ActionResult IndexDocuments()
         {
@@ -36,7 +105,7 @@ namespace ImageSearchEngine.Controllers
             Directory dir = FSDirectory.Open(INDEX_DIRECTORY);
             Directory docDirectory = FSDirectory.Open(DOCUMENT_DIRECTORY);
             IndexWriter writer = new IndexWriter(dir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
-
+            writer.SetSimilarity(similarity);
             string[] files = docDirectory.ListAll();
             foreach (string f in files)
             {
@@ -89,6 +158,84 @@ namespace ImageSearchEngine.Controllers
             return seenList;
         }
 
+        
+
+        public ActionResult FindSimilar(int docid)
+        {
+            IndexReader reader = DirectoryReader.Open(FSDirectory.Open(INDEX_DIRECTORY), true);
+
+            DateTime start = DateTime.Now;
+
+            IndexSearcher searcher = new IndexSearcher(reader);
+            Document document = searcher.Doc(docid);
+
+            Similarity sim = similarity;
+            Analyzer analyzer = new WhitespaceAnalyzer();
+            searcher.Similarity = sim;
+
+            QueryParser parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, "contents", analyzer);
+            Directory dir = FSDirectory.Open(INDEX_DIRECTORY);
+            Directory docDirectory = FSDirectory.Open(DOCUMENT_DIRECTORY);
+
+            string[] files = docDirectory.ListAll();
+            string contents = "";
+            foreach (string f in files)
+            {
+                TrecDocIterator iterator = new TrecDocIterator(DOCUMENT_DIRECTORY + "\\" + f);
+                Document d;
+                while (iterator.MoveNext())
+                {
+                    d = iterator.Current;
+                    if (d != null && d.GetField("contents") != null)
+                    {
+                        if (d.Get("docno").Equals(document.Get("docno")))
+                        {
+                            contents = d.Get("contents");
+                            int textIndex = contents.IndexOf("<TEXT>");
+                            contents = contents.Substring(textIndex + 6);
+                            int endTextIndex = contents.IndexOf("</TEXT>");
+                            contents = contents.Substring(0, endTextIndex);
+                        }
+                    }
+                }
+            }
+
+            Query q = getQueryFromBagOfWords(contents, analyzer, searcher);
+
+            List<string> similarImages = doBatchSearch(null, searcher, "", q, "");
+
+            List<string> returnedSimilarImages = new List<string>();
+            
+            for (int i = 0; i < Math.Min(similarImages.Count, 10); ++i)
+            {
+                if (similarImages[i] == document.Get("docno"))
+                    continue;
+
+                returnedSimilarImages.Add(Url.Content(Constants.VIRTUALPATH_TO_IMAGES + similarImages[i]));
+            }
+            TimeSpan time = DateTime.Now - start;
+
+            SimilarImageResult result = new SimilarImageResult()
+            {
+                PathToQueryImage = Url.Content(Constants.VIRTUALPATH_TO_IMAGES + document.Get("docno")),
+                QueryTimeMilliseconds = (int)time.TotalMilliseconds,
+                QueryTimeSeconds = (int)time.TotalSeconds,
+                SimilarImages = returnedSimilarImages
+
+            };
+            return View(result);
+        }
+
+        private Query getQueryFromBagOfWords(string bagOfWords, Analyzer analyzer, IndexSearcher searcher)
+        {
+            System.IO.StringReader strReader = new System.IO.StringReader(bagOfWords);
+            QueryParser parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, "contents", analyzer);
+
+            Query query = parser.Parse(bagOfWords);
+
+            return query;
+        }
+
         public ActionResult Query(HttpPostedFileBase queryImage)
         {
             DateTime start = DateTime.Now;
@@ -100,7 +247,7 @@ namespace ImageSearchEngine.Controllers
             string pathToQueryFolder = HttpContext.Server.MapPath(queryFolder);
 
             string bagOfWords = KeypointExtractor.GetBagOfWords(queryImage.InputStream, queryId, pathToQueryFolder);
-            Similarity sim = new DefaultSimilarity();
+            Similarity sim = similarity;
             IndexReader reader = DirectoryReader.Open(FSDirectory.Open(INDEX_DIRECTORY),true);
             Analyzer analyzer = new WhitespaceAnalyzer();// new StopAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -181,6 +328,12 @@ namespace ImageSearchEngine.Controllers
             public List<string> SimilarImages;
             public int QueryTimeSeconds;
             public int QueryTimeMilliseconds;
+        }
+
+        public class BrowseImageResult
+        {
+            public string PathToImage;
+            public int ImageIndexId;
         }
 
     }

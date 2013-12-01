@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "FindSimilar";
+}
+@model ImageSearchEngine.Controllers.HomeController.SimilarImageResult
+
+<style type="text/css">
+    .results
+    {
+        width:500px;
+    }
+    .results div
+    {
+        float: left;
+    }
+</style>
+
+<h2>Find Similar Images</h2>
+
+<div>
+    Query took @Model.QueryTimeSeconds seconds.
+    Query took @Model.QueryTimeMilliseconds ms.
+</div>
+
+<h3>Query Image</h3>
+<br />
+<img src="@Model.PathToQueryImage" />
+<h3>Similar Images</h3>
+<br />
+<div class="results">
+    @foreach (string img in Model.SimilarImages)
+    {
+    
+        <div><img src="@img" /></div>
+    }
+    <div style="clear:both;"></div>
+</div>
