@@ -33,9 +33,9 @@ namespace {
     const char* algos[] = { "linear","kdtree", "kmeans", "composite" };
     const char* centers_algos[] = { "random", "gonzales", "kmeanspp" };
 		
-	const char SIZES_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.size";
-	const char FEATURE_FILE[] ="C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\esp.feature";
-	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\features\\imglist.txt";
+	const char SIZES_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.size";
+	const char FEATURE_FILE[] ="C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.feature";
+	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\imglist.txt";
 	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
 	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.xb";
 	const char FLANN_INDEX_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\flann_index.xb";
@@ -251,9 +251,16 @@ float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
 			float n;
 			while(k < KEYPOINT_SIZE)
 			{
+				
 				featureFileStream >> n;
 				data[current_keypoint * KEYPOINT_SIZE + k] = n;
 				++k;
+			}
+
+			if(current_keypoint % 1000 == 0)
+			{
+				cout << "Read (" << (double)(current_keypoint) / (double)(total_keypoints) * 100 
+					<< "%)" << current_keypoint << "/" << total_keypoints << " keypoints." << endl;
 			}
 
 			current_keypoint++;
@@ -300,7 +307,8 @@ void writeClusterData(float* cluster_centers, int clusters_returned, const int K
 	FILE* file = fopen(CLUSTER_FILE_BINARY, "wb");
 	if(!file)
 	{
-		cout << "Could not open " << CLUSTER_FILE_BINARY << endl;
+		cout << "Could not open for writing " << CLUSTER_FILE_BINARY << endl;
+		return;
 	}
 	else
 	{
@@ -339,7 +347,7 @@ float* ReadClusterFile(int* numClusters)
 	FILE* file = fopen(CLUSTER_FILE_BINARY, "rb");
 	if(!file)
 	{
-		cout << "Could not open " << CLUSTER_FILE_BINARY << endl;
+		cout << "Could not open for reading " << CLUSTER_FILE_BINARY << endl;
 		return new float[0];
 	}	
 	
@@ -510,7 +518,7 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 		Call FLANN Library
 
 	*/
-	/*
+	
 	const int CLUSTERS = 150000;
 	IndexParameters index_params;
 	index_params.algorithm = KMEANS;
@@ -529,9 +537,9 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 	
 	int clusters_returned = flann_result;
 	writeClusterData(cluster_centers, clusters_returned, KEYPOINT_SIZE);
-	*/
-	int clusters_returned;
-	float* cluster_centers = ReadClusterFile(&clusters_returned);
+	
+	//int clusters_returned;
+	//float* cluster_centers = ReadClusterFile(&clusters_returned);
 
 	IndexParameters build_index_params;
 	build_index_params.algorithm = KDTREE;

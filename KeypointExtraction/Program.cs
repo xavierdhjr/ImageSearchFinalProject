@@ -15,7 +15,6 @@ using System.Drawing.Drawing2D;
 using Adrian.Imaging.PGMConverter;
 using OpenSURFcs;
 
-using System.Runtime.InteropServices;
 
 using OpenCV.Net;
 
@@ -92,16 +91,18 @@ namespace KeypointExtraction
             char[] imgListFile = (Constants.PATH_TO_FEATURES + "/" + Constants.IMGLIST_FILE).ToCharArray();
             char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray());
             testImage();
+            testImage();
+            testImage();
             //UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
         }
 
         public static void testImage()
         {
             List<string> similarImages = new List<string>();
-            string pgmFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\3207588f-a359-4fff-8f76-6169f53f0cc6.pgm";
-            string keyFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\5db64103-80f1-4787-96ae-faa730dc87b9.pgm.key";
-            
-            string pathToSift = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\siftWin32.exe";
+            string pgmFileName = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\queries\6d677ec7-c4ab-4526-98dc-cd16b94b9eb7.pgm";
+            string keyFileName = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\queries\6d677ec7-c4ab-4526-98dc-cd16b94b9eb7.pgm.key";
+
+            string pathToSift = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\siftWin32.exe";
 
             ProcessStartInfo siftInfo = new ProcessStartInfo()
             {
