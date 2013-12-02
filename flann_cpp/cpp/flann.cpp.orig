@@ -32,15 +32,19 @@ namespace {
     
     const char* algos[] = { "linear","kdtree", "kmeans", "composite" };
     const char* centers_algos[] = { "random", "gonzales", "kmeanspp" };
+<<<<<<< Updated upstream
 		
 	const char SIZES_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.size";
-	FLANN_INDEX BUILT_INDEX = 0x0;
-	int SIZE_BUILT_INDEx = 0;
 	const char FEATURE_FILE[] ="C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.feature";
 	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\imglist.txt";
 	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
 	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.xb";
 	const char FLANN_INDEX_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\flann_index.xb";
+=======
+
+	FLANN_INDEX BUILT_INDEX = 0x0;
+	
+>>>>>>> Stashed changes
 	Params parametersToParams(IndexParameters parameters)
 	{
 		Params p;
@@ -221,7 +225,12 @@ void readSizes(vector<int>* outSizes)
 		int i = 0;
 		while(!sizeFileStream.eof())
 		{
+<<<<<<< Updated upstream
 			//if(i > 5) break;
+=======
+			if(i > 500) // arbitrary limit to reduce time
+				break;
+>>>>>>> Stashed changes
 			int size;
 			sizeFileStream >> size;
 			(*outSizes).push_back(size);
@@ -289,6 +298,11 @@ void readImageNames(vector<string>* outNames)
 		int i = 0;
 		while(!imageFileStream.eof())
 		{
+<<<<<<< Updated upstream
+=======
+			if(i > 500) // arbitrary limit to reduce time
+				break;
+>>>>>>> Stashed changes
 			string size;
 			imageFileStream >> size;
 			(*outNames).push_back(size);
@@ -328,9 +342,8 @@ int buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, 
 {
 	if(BUILT_INDEX != 0x0)
 	{
-		cout << "Index already built! Ptr:" << BUILT_INDEX << endl;
 		outIndex = &BUILT_INDEX;
-		return SIZE_BUILT_INDEx;
+		return;
 	}
 	IndexParameters build_index_params;
 	build_index_params.algorithm = KDTREE;
@@ -341,15 +354,16 @@ int buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, 
 	build_index_params.memory_weight = 1;
 
 	float speedup;
+<<<<<<< Updated upstream
 	NNIndex* index = flann_build_nnindex(cluster_centers,num_clusters,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
 	*outIndex = index;
-	cout << "address of built index: " << BUILT_INDEX << endl;
+=======
+	*outIndex = flann_build_index(cluster_centers,num_clusters,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
 	if(BUILT_INDEX == 0x0)
 	{
-		cout << "Saved index." << endl;
 		BUILT_INDEX = *outIndex;
-		SIZE_BUILT_INDEx = index->usedMemory();
 	}
+>>>>>>> Stashed changes
 	cout << "Build index. " << endl;
 	return index->usedMemory();
 }
@@ -448,7 +462,7 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 
 	float* cluster_centers = ReadClusterFile(&num_clusters);
 	FLANN_INDEX index;
-	cout << "BEANS" << endl;
+	
 	int indexSizeBytes = buildIndex(&index, cluster_centers, num_clusters, 128);
 
 	/*
