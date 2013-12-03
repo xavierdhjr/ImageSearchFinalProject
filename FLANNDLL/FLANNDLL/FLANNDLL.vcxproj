@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>C:\Users\Raider\ImageSearchFinalProject\KeypointExtraction\bin\Debug</OutDir>
+    <OutDir>C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\KeypointExtraction\bin\Debug</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

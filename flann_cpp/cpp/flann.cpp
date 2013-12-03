@@ -37,6 +37,7 @@ namespace {
 	FLANN_INDEX BUILT_INDEX = 0x0;
 	int SIZE_BUILT_INDEx = 0;
 	const char FEATURE_FILE[] ="C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.feature";
+	const char FEATURE_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.feature.xb";
 	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\imglist.txt";
 	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
 	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.xb";
@@ -241,10 +242,32 @@ float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
 	ifstream featureFileStream;
 	featureFileStream.open(FEATURE_FILE);
 	
+	FILE* file = fopen(FEATURE_FILE_BINARY, "rb");
 	float* data = new float[total_keypoints * KEYPOINT_SIZE];
+	if(!file)
+	{
+		cout << "Could not open for reading " << FEATURE_FILE_BINARY << endl;
+	}
+	else
+	{
+		cout << "Reading features from binary " << FEATURE_FILE_BINARY << endl;
+		fread(data, sizeof(float), total_keypoints * KEYPOINT_SIZE, file);
+		cout << "Finished read of features from binary." << endl;
+		return data;
+	}
+
+
 	if(featureFileStream.is_open())
 	{
 		cout << "Successfully opened " << FEATURE_FILE << endl;
+
+		file = fopen(FEATURE_FILE_BINARY, "wb");
+		if(!file)
+		{
+			cout << "Could not open for writing " << FEATURE_FILE_BINARY << endl;
+			featureFileStream.close();
+			return new float[0];
+		}
 
 		int current_keypoint = 0;
 		while(current_keypoint < total_keypoints)
@@ -256,10 +279,11 @@ float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
 				
 				featureFileStream >> n;
 				data[current_keypoint * KEYPOINT_SIZE + k] = n;
+				
 				++k;
 			}
 
-			if(current_keypoint % 1000 == 0)
+			if(current_keypoint % 10000 == 0)
 			{
 				cout << "Read (" << (double)(current_keypoint) / (double)(total_keypoints) * 100 
 					<< "%)" << current_keypoint << "/" << total_keypoints << " keypoints." << endl;
@@ -269,6 +293,8 @@ float* readFeatures(int total_keypoints, const int KEYPOINT_SIZE)
 		}
 		
 		cout << "Read in " << current_keypoint << " keypoints." << endl;
+		fwrite(data, sizeof(float), total_keypoints * KEYPOINT_SIZE, file);
+		cout << "Wrote " << current_keypoint << " keypoints to binary file." << endl;
 		featureFileStream.close();
 	}
 	else
@@ -324,12 +350,11 @@ void writeClusterData(float* cluster_centers, int clusters_returned, const int K
 
 
 }
-int buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, int KEYPOINT_SIZE)
+int buildIndex(float* cluster_centers, int num_clusters, int KEYPOINT_SIZE)
 {
 	if(BUILT_INDEX != 0x0)
 	{
 		cout << "Index already built! Ptr:" << BUILT_INDEX << endl;
-		outIndex = &BUILT_INDEX;
 		return SIZE_BUILT_INDEx;
 	}
 	IndexParameters build_index_params;
@@ -342,12 +367,12 @@ int buildIndex(FLANN_INDEX* outIndex, float* cluster_centers, int num_clusters, 
 
 	float speedup;
 	NNIndex* index = flann_build_nnindex(cluster_centers,num_clusters,KEYPOINT_SIZE,&speedup, &build_index_params,NULL);
-	*outIndex = index;
+
 	cout << "address of built index: " << BUILT_INDEX << endl;
 	if(BUILT_INDEX == 0x0)
 	{
 		cout << "Saved index." << endl;
-		BUILT_INDEX = *outIndex;
+		BUILT_INDEX = index;
 		SIZE_BUILT_INDEx = index->usedMemory();
 	}
 	cout << "Build index. " << endl;
@@ -363,7 +388,7 @@ float* ReadClusterFile(int* numClusters)
 	if(!file)
 	{
 		cout << "Could not open for reading " << CLUSTER_FILE_BINARY << endl;
-		return new float[0];
+		return 0x0;
 	}	
 	
 	
@@ -386,6 +411,9 @@ float* ReadClusterFile(int* numClusters)
 	*numClusters = total_point_dims; // set value of numClusters to length
 	std::cout << "Finished reading cluster file. Read " << length << " sizes." << std::endl;
 	//fileStream.close();
+	
+	fclose(file);
+
 	return cluster_centers;
 }
 
@@ -440,6 +468,15 @@ FLANN_INDEX readIndexFile()
 	return 0x0;
 }
 
+EXPORTED void WarmUp()
+{
+	int num_clusters;
+	float* cluster_centers = ReadClusterFile(&num_clusters);
+	if(cluster_centers == 0x0) return; // no cluster file to report
+
+	int indexSizeBytes = buildIndex(cluster_centers, num_clusters, 128); // keep the index in memory.
+
+}
 EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 {	
 
@@ -447,9 +484,9 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 	//float* cluster_centers = (float*)::CoTaskMemAlloc(4609 * 128 * sizeof(float));
 
 	float* cluster_centers = ReadClusterFile(&num_clusters);
-	FLANN_INDEX index;
+
 	cout << "BEANS" << endl;
-	int indexSizeBytes = buildIndex(&index, cluster_centers, num_clusters, 128);
+	int indexSizeBytes = buildIndex(cluster_centers, num_clusters, 128);
 
 	/*
 	writeIndexFile(index2, indexSizeBytes);
@@ -473,14 +510,14 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 	const int KEYPOINT_SIZE = 128;
 	for(int j = 0; j < num_keypoints / KEYPOINT_SIZE; ++j) //(num_keypoints / KEYPOINT_SIZE)
 	{
-		float* keypoint = new float[KEYPOINT_SIZE];
+		float keypoint[KEYPOINT_SIZE];
 		for(int k = 0; k < KEYPOINT_SIZE; ++k)
 		{
 			keypoint[k] = keypoint_data[keypoints_examined * KEYPOINT_SIZE + k];
 		}
 		keypoints_examined++;
-		int* nearest_neighbor = new int[1];
-		int _r = flann_find_nearest_neighbors_index(index,keypoint,1,nearest_neighbor,1,1024,&flann_params);
+		int nearest_neighbor[1];// = new int[1];
+		int _r = flann_find_nearest_neighbors_index(BUILT_INDEX,keypoint,1,nearest_neighbor,1,1024,&flann_params);
 		strStream << "w" << nearest_neighbor[0] << " ";
 	}
 	strStream << endl << "</TEXT>" << endl;
@@ -502,7 +539,9 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
     strcpy(pszReturn, strStream.str().c_str());
 	//cout << pszReturn << endl;
     // Return pszReturn.
-	
+
+	delete cluster_centers;
+
     return pszReturn;
 }
 

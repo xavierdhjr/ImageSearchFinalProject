@@ -18,10 +18,17 @@ namespace ImageSearchEngine
         {
             AreaRegistration.RegisterAllAreas();
 
+            KeypointExtraction.KeypointExtractor.WarmUpFLANN();
+
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
         }
     }
 }

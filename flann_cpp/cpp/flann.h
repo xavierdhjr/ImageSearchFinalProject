@@ -49,6 +49,7 @@ typedef void* FLANN_INDEX;
 extern "C" {
 #endif
 
+LIBSPEC void WarmUp();
 LIBSPEC char* CreateBagOfWords(float* keypoint_data, int num_keypoints);
 
 LIBSPEC void UpdateClusterCenters(char sizeFile[], char featureFile[], char clusterOutputFile[]);

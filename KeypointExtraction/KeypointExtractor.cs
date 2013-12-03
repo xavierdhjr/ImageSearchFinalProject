@@ -21,7 +21,14 @@ namespace KeypointExtraction
 {
     public class KeypointExtractor
     {
-        
+        [DllImport("FLANNDLL.dll", CallingConvention = CallingConvention.Cdecl)]
+        static extern void WarmUp();
+
+        public static void WarmUpFLANN()
+        {
+            WarmUp();
+        }
+
         /// <summary>
         /// Saves a PGM file to the disk, and sends that to the sift tool.
         /// Returns the path to a file with keypoints.

@@ -99,10 +99,10 @@ namespace KeypointExtraction
         public static void testImage()
         {
             List<string> similarImages = new List<string>();
-            string pgmFileName = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\queries\6d677ec7-c4ab-4526-98dc-cd16b94b9eb7.pgm";
-            string keyFileName = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\queries\6d677ec7-c4ab-4526-98dc-cd16b94b9eb7.pgm.key";
+            string pgmFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\c1928963-849b-40a8-92cd-a8fc05820d31.pgm";
+            string keyFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\c1928963-849b-40a8-92cd-a8fc05820d31.pgm.key";
 
-            string pathToSift = @"C:\Users\Raider\ImageSearchFinalProject\ImageSearchEngine\siftWin32.exe";
+            string pathToSift = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\siftWin32.exe";
 
             ProcessStartInfo siftInfo = new ProcessStartInfo()
             {
