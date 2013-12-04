@@ -40,7 +40,7 @@ namespace {
 	const char FEATURE_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\esp.feature.xb";
 	const char IMAGELIST_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\cse484project\\cse484project\\features\\imglist.txt";
 	const char CLUSTER_FILE[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.txt";
-	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters.xb";
+	const char CLUSTER_FILE_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\clusters_small.xb";
 	const char FLANN_INDEX_BINARY[] = "C:\\Users\\Raider\\Desktop\\MSU\\FS13\\CSE484\\project\\flann_index.xb";
 	Params parametersToParams(IndexParameters parameters)
 	{
@@ -634,17 +634,16 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 
 			for(int j = 0; j < sizes[i]; ++j)
 			{
-				float* keypoint = new float[KEYPOINT_SIZE];
+				float keypoint[KEYPOINT_SIZE];
 				for(int k = 0; k < KEYPOINT_SIZE; ++k)
 				{
 					keypoint[k] = flann_data[keypoints_examined * KEYPOINT_SIZE + k];
 				}
 				keypoints_examined++;
-				int* nearest_neighbor = new int[1];
+				int nearest_neighbor[1];
 				int _r = flann_find_nearest_neighbors_index(index,keypoint,1,nearest_neighbor,1,1024,&flann_params);
 				bagOfWordsStream << "w" << nearest_neighbor[0] << " ";
-				delete keypoint;
-				delete nearest_neighbor;
+
 			}
 			bagOfWordsStream << endl << "</TEXT>" << endl;
 			bagOfWordsStream << "</DOC>" << endl;

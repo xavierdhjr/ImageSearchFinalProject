@@ -1,8 +1,12 @@
 ﻿@{
     ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@section scripts
+{
 <script src="~/Scripts/plugins/jquery.form.min.js"></script>
 <script src="~/Scripts/site/imagequery.home.js"></script>
+}
 
 <h2>Index</h2>
 
@@ -10,4 +14,3 @@
     <input type="file" name="queryImage" />
     Submit a query image: <input type="submit" />
 </form>
-<div id="response"></div>

@@ -1,9 +1,12 @@
 ﻿@{
     ViewBag.Title = "Browse";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @using ImageSearchEngine.Controllers
 @model List<HomeController.BrowseImageResult>
 
+@section style
+{
 <style type="text/css">
     .browse-image
     {   
@@ -15,7 +18,7 @@
         width:500px;
     }
 </style>
-
+}
 <h2>Browse</h2>
 
 

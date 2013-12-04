@@ -1,8 +1,11 @@
 ﻿@{
     ViewBag.Title = "FindSimilar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @model ImageSearchEngine.Controllers.HomeController.SimilarImageResult
 
+@section style
+{
 <style type="text/css">
     .results
     {
@@ -13,8 +16,9 @@
         float: left;
     }
 </style>
-
+}
 <h2>Find Similar Images</h2>
+<a href="@Url.Action("Browse")">Go back to browse</a>
 
 <div>
     Query took @Model.QueryTimeSeconds seconds.

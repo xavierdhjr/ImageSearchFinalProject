@@ -90,10 +90,8 @@ namespace KeypointExtraction
             char[] featuresFile = (Constants.PATH_TO_FEATURES + "/" + Constants.FEATURES_FILE).ToCharArray();
             char[] imgListFile = (Constants.PATH_TO_FEATURES + "/" + Constants.IMGLIST_FILE).ToCharArray();
             char[] clusterOutputFile = (Constants.PATH_TO_CLUSTERS_FILE.ToCharArray());
-            testImage();
-            testImage();
-            testImage();
-            //UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
+
+            UpdateClusterCenters(sizeFile, featuresFile, clusterOutputFile);
         }
 
         public static void testImage()

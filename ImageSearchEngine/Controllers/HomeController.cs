@@ -21,29 +21,26 @@ namespace ImageSearchEngine.Controllers
 {
     public class HomeController : Controller
     {
-        private class NoNormSimilarity : Similarity
+        private class BM25Similarity : Similarity
         {
-            public override float ComputeNorm(string field, FieldInvertState state)
-            {
-                return 1;
-            }
 
             public override float Idf(int docFreq, int numDocs)
             {
                 //float retval =  (1 + (numDocs - docFreq + 0.5f)) / docFreq + 1;
-                return 1;
+                return (float)Math.Log(1 + (numDocs - docFreq + 0.5f) / (docFreq + 0.5f));
             }
             public override float SloppyFreq(int distance)
             {
-                return 1;
+                return 1 / (distance + 1);
             }
+
 
             public override float Coord(int overlap, int maxOverlap)
             {
                 return 1;
             }
 
-            public override float Tf(float freq)
+            public override float LengthNorm(string fieldName, int numTokens)
             {
                 return 1;
             }
@@ -53,7 +50,7 @@ namespace ImageSearchEngine.Controllers
                 return 1;
             }
 
-            public override float LengthNorm(string fieldName, int numTokens)
+            public override float Tf(float freq)
             {
                 return 1;
             }
@@ -199,6 +196,8 @@ namespace ImageSearchEngine.Controllers
                     }
                 }
             }
+
+
 
             Query q = getQueryFromBagOfWords(contents, analyzer, searcher);
 
