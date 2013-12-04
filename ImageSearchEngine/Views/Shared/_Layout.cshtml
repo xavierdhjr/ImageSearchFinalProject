@@ -7,7 +7,9 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @RenderSection("style", required: false)
-    
+    <style type="text/css">
+
+    </style>
 </head>
 <body>
     <div class="nav">
@@ -16,6 +18,13 @@
         </h2>
         <div>
             <a href="@Url.Action("Index")">Home</a> | <a href="@Url.Action("Browse")">Browse Images</a> | <a href="@Url.Action("IndexDocuments")">Index Documents</a>
+        </div>
+        <div style="margin-top:30px;">
+            <h2>Submit a Query</h2>
+            <form id="homeForm" action="/Home/Query" method="post" enctype="multipart/form-data">
+                <input type="file" name="queryImage" />
+                Submit a query image: <input type="submit" />
+            </form>
         </div>
     </div>
     <div>

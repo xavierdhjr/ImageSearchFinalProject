@@ -45,7 +45,7 @@ namespace KeypointExtraction
             {
                 inputStream.CopyTo(file);
             }
-
+            
             Bitmap pgmConvertedToBitmap = PGMUtil.ToBitmap(pgmFileName);
             IntegralImage iimg = IntegralImage.FromImage(pgmConvertedToBitmap);
             List<IPoint> ipts = FastHessian.getIpoints(0.0002f, 5, 1, iimg);

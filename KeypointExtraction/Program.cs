@@ -97,8 +97,8 @@ namespace KeypointExtraction
         public static void testImage()
         {
             List<string> similarImages = new List<string>();
-            string pgmFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\c1928963-849b-40a8-92cd-a8fc05820d31.pgm";
-            string keyFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\c1928963-849b-40a8-92cd-a8fc05820d31.pgm.key";
+            string pgmFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\10fc3747-e32c-43e0-8b56-ebfc5a9797a7.pgm";
+            string keyFileName = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\queries\10fc3747-e32c-43e0-8b56-ebfc5a9797a7.pgm.key";
 
             string pathToSift = @"C:\Users\Raider\Documents\Visual Studio 2012\Projects\ImageSearchEngine\ImageSearchEngine\siftWin32.exe";
 
@@ -168,7 +168,7 @@ namespace KeypointExtraction
 
         static void Main(string[] args)
         {
-            doUpdateclusters();
+            testImage();
         }
     }
 }

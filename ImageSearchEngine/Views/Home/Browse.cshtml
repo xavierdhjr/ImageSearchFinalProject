@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @using ImageSearchEngine.Controllers
-@model List<HomeController.BrowseImageResult>
+@model HomeController.BrowseModel
 
 @section style
 {
@@ -11,19 +11,39 @@
     .browse-image
     {   
         float:left;
+        padding:10px;
         margin:10px;
+        background-color:#e5e5e5;
+    } 
+    .browse-image img
+    {
+        max-width:200px;
     }
     .browse-images-wrapper
     {
-        width:500px;
+        width:100%;
+        padding:30px;
+        box-sizing:border-box;
     }
 </style>
 }
 <h2>Browse</h2>
 
 
+<div class="browse-nav">
+
+    @for (int i = Math.Max(Model.page - 5,0); i < Math.Min(Model.page + 5, Model.MaxPages); ++i)
+    {
+        if(i != Model.page)
+        {
+            <a href="@Url.Action("Browse",new { page = i, results = Model.resultsPerPage })">Page @(i)</a><span> | </span>
+        }else{
+            <span>Page @(i) | </span>   
+        }
+    }
+</div>
 <div class="browse-images-wrapper">
-    @foreach (HomeController.BrowseImageResult result in Model)
+    @foreach (HomeController.BrowseImageResult result in Model.Images)
     {
         <a href="/Home/FindSimilar?docid=@result.ImageIndexId">
             <div class="browse-image" >
@@ -33,4 +53,16 @@
     }
 
     <div style="clear:both;"></div>
+</div>
+<div class="browse-nav">
+
+    @for (int i = Math.Max(Model.page - 5,0); i < Math.Min(Model.page + 5, Model.MaxPages); ++i)
+    {
+        if(i != Model.page)
+        {
+            <a href="@Url.Action("Browse",new { page = i, results = Model.resultsPerPage })">Page @(i)</a><span> | </span>
+        }else{
+            <span>Page @(i) | </span>   
+        }
+    }
 </div>

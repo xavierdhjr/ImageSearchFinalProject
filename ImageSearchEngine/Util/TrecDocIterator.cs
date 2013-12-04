@@ -19,7 +19,7 @@ namespace ImageSearchEngine.Util
             get
             {
                 Document doc = new Document();
-                StreamReader reader = new StreamReader(_reader);
+                StreamReader reader = _reader;
                 StringBuilder builder = new StringBuilder();
                 //StringReader stringReader;
                 try
@@ -68,14 +68,21 @@ namespace ImageSearchEngine.Util
                 {
                     doc = null;
                 }
+                ++i;
                 return doc;
             }
         }
 
-        FileStream _reader;
+        FileStream _fs;
+        StreamReader _reader;
         string _filePath;
         bool _eof;
 
+        int i = 0;
+        public int DocsIterated
+        {
+            get { return i; }
+        }
         public TrecDocIterator(string pathToFile)
         {
             _filePath = pathToFile;
@@ -90,7 +97,9 @@ namespace ImageSearchEngine.Util
         public void Reset()
         {
             _eof = false;
-            _reader = File.OpenRead(_filePath);
+
+            _fs = File.OpenRead(_filePath);
+            _reader = new StreamReader(_fs);
         }
 
         public void Dispose()

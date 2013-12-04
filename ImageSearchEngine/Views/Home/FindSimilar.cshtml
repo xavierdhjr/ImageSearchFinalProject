@@ -11,13 +11,9 @@
     {
         width:500px;
     }
-    .results div
-    {
-        float: left;
-    }
 </style>
 }
-<h2>Find Similar Images</h2>
+<h2>Query Results</h2>
 <a href="@Url.Action("Browse")">Go back to browse</a>
 
 <div>
@@ -31,10 +27,13 @@
 <h3>Similar Images</h3>
 <br />
 <div class="results">
+    @{ int i = 0; }
     @foreach (string img in Model.SimilarImages)
     {
-    
-        <div><img src="@img" /></div>
+        i++;
+        <div>
+            Result @i <br /><img src="@img" />
+        </div>
     }
     <div style="clear:both;"></div>
 </div>

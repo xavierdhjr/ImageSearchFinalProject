@@ -482,11 +482,11 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 
 	int num_clusters;
 	//float* cluster_centers = (float*)::CoTaskMemAlloc(4609 * 128 * sizeof(float));
-
+	const int KEYPOINT_SIZE = 128;
 	float* cluster_centers = ReadClusterFile(&num_clusters);
 
 	cout << "BEANS" << endl;
-	int indexSizeBytes = buildIndex(cluster_centers, num_clusters, 128);
+	int indexSizeBytes = buildIndex(cluster_centers, num_clusters, KEYPOINT_SIZE);
 
 	/*
 	writeIndexFile(index2, indexSizeBytes);
@@ -507,7 +507,7 @@ EXPORTED char* CreateBagOfWords(float* keypoint_data, int num_keypoints)
 	strStream << "<TEXT>" << endl;
 
 	int keypoints_examined = 0;
-	const int KEYPOINT_SIZE = 128;
+
 	for(int j = 0; j < num_keypoints / KEYPOINT_SIZE; ++j) //(num_keypoints / KEYPOINT_SIZE)
 	{
 		float keypoint[KEYPOINT_SIZE];
@@ -632,11 +632,12 @@ EXPORTED void UpdateClusterCenters(char sizeFile[], char featureFile[], char clu
 
 			int keypoints_i = sizes[i];
 
-			for(int j = 0; j < sizes[i]; ++j)
+			for(int j = 0; j < keypoints_i; ++j)
 			{
 				float keypoint[KEYPOINT_SIZE];
 				for(int k = 0; k < KEYPOINT_SIZE; ++k)
 				{
+
 					keypoint[k] = flann_data[keypoints_examined * KEYPOINT_SIZE + k];
 				}
 				keypoints_examined++;

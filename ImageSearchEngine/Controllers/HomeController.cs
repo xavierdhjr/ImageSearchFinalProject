@@ -21,13 +21,14 @@ namespace ImageSearchEngine.Controllers
 {
     public class HomeController : Controller
     {
+
         private class BM25Similarity : Similarity
         {
 
             public override float Idf(int docFreq, int numDocs)
             {
                 //float retval =  (1 + (numDocs - docFreq + 0.5f)) / docFreq + 1;
-                return (float)Math.Log(1 + (numDocs - docFreq + 0.5f) / (docFreq + 0.5f));
+                return (float)Math.Log(1 + (numDocs - docFreq + 0.5f) / (docFreq + 0.5f)) + 1;
             }
             public override float SloppyFreq(int distance)
             {
@@ -37,7 +38,7 @@ namespace ImageSearchEngine.Controllers
 
             public override float Coord(int overlap, int maxOverlap)
             {
-                return 1;
+                return (float)Math.Pow((float)overlap / (float)maxOverlap,2);
             }
 
             public override float LengthNorm(string fieldName, int numTokens)
@@ -52,7 +53,7 @@ namespace ImageSearchEngine.Controllers
 
             public override float Tf(float freq)
             {
-                return 1;
+                return freq;
             }
         }
         //
@@ -91,14 +92,22 @@ namespace ImageSearchEngine.Controllers
                 i++;
             }
 
-            return View(imagePaths);
+            BrowseModel model = new BrowseModel()
+            {
+                page = page,
+                resultsPerPage = results,
+                Images = imagePaths,
+                MaxPages = reader.MaxDoc / results
+            };
+
+            return View(model);
         }
 
         public ActionResult IndexDocuments()
         {
             DateTime start = DateTime.Now;
 
-            Analyzer analyzer = new WhitespaceAnalyzer();// new StopAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
+            Analyzer analyzer = new WhitespaceAnalyzer();// new WhitespaceAnalyzer();// new StopAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
             Directory dir = FSDirectory.Open(INDEX_DIRECTORY);
             Directory docDirectory = FSDirectory.Open(DOCUMENT_DIRECTORY);
             IndexWriter writer = new IndexWriter(dir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
@@ -106,16 +115,20 @@ namespace ImageSearchEngine.Controllers
             string[] files = docDirectory.ListAll();
             foreach (string f in files)
             {
-                TrecDocIterator iterator = new TrecDocIterator(DOCUMENT_DIRECTORY + "\\" + f);
-                Document d;
-                while (iterator.MoveNext())
+                using (TrecDocIterator iterator = new TrecDocIterator(DOCUMENT_DIRECTORY + "\\" + f))
                 {
-                    d = iterator.Current;
-                    if (d != null && d.GetField("contents") != null)
+
+                    Document d;
+                    while (iterator.MoveNext())
                     {
-                        writer.AddDocument(d);
+                        d = iterator.Current;
+                        if (d != null && d.GetField("contents") != null)
+                        {
+                            writer.AddDocument(d);
+                        }
                     }
                 }
+                
             }
 
             writer.Dispose();
@@ -207,8 +220,7 @@ namespace ImageSearchEngine.Controllers
             
             for (int i = 0; i < Math.Min(similarImages.Count, 10); ++i)
             {
-                if (similarImages[i] == document.Get("docno"))
-                    continue;
+               
 
                 returnedSimilarImages.Add(Url.Content(Constants.VIRTUALPATH_TO_IMAGES + similarImages[i]));
             }
@@ -309,7 +321,7 @@ namespace ImageSearchEngine.Controllers
             result.QueryTimeSeconds = (int)timeItTook.TotalSeconds;
             result.QueryTimeMilliseconds = (int)timeItTook.TotalMilliseconds;
 
-            return View(result);
+            return View("FindSimilar",result);
             /*
             string keyFile = KeypointExtractor.ConvertPGMToKeyPoints(queryImage.InputStream, queryId, pathToWinSift, pathToQueryFolder);
             List<Keypoint128> keypoints = KeypointExtractor.GetKeypointsFromKeyFile(keyFile);
@@ -333,6 +345,14 @@ namespace ImageSearchEngine.Controllers
         {
             public string PathToImage;
             public int ImageIndexId;
+        }
+
+        public class BrowseModel
+        {
+            public List<BrowseImageResult> Images;
+            public int page;
+            public int resultsPerPage;
+            public int MaxPages;
         }
 
     }
